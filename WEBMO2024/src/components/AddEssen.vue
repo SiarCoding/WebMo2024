@@ -39,6 +39,7 @@ export default {
         console.log('Serverantwort:', response);
         if (response.data.success) {
           this.message = 'Essen erfolgreich hinzugefügt!';
+          this.$emit('essenAdded', response.data.essen); // Neues Essen über ein Event melden
           this.essen = { name: '', beschreibung: '', preis: 0 };  // Formular zurücksetzen
         }
       } catch (error) {

@@ -2,13 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Essen from './components/Essen.vue';
 import Essensplan from './components/Essensplan.vue';
 import Login from './components/Login.vue';
-import AddEssen from './components/AddEssen.vue';  // Import der neuen Komponente
+import AddEssen from './components/AddEssen.vue';
 
 const routes = [
-  { path: '/', component: Login },
+  { path: '/', redirect: '/login' },
+  { path: '/login', component: Login },
   { path: '/essen', component: Essen },
   { path: '/essensplan', component: Essensplan },
-  { path: '/add-essen', component: AddEssen }  // Route für Essen hinzufügen
+  { path: '/add-essen', component: AddEssen },
 ];
 
 const router = createRouter({

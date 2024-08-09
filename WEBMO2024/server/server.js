@@ -12,9 +12,8 @@ const users = [
   { username: 'admin', password: 'admin123' }
 ];
 
-let essen = [
-  // Beispiel-Daten
-];
+let nextId = 1; // ID Zähler
+let essen = []; // Deine Essenliste
 
 let essensplaene = [
   // Beispiel-Daten für Essenspläne
@@ -32,10 +31,10 @@ app.post('/login', (req, res) => {
   }
 });
 
-// Route für Essen hinzufügen
+
 app.post('/api/essen', (req, res) => {
-  const neuesEssen = req.body;
-  essen.push(neuesEssen);  // Fügt das neue Essen zur Liste hinzu
+  const neuesEssen = { id: nextId++, ...req.body };
+  essen.push(neuesEssen);
   res.status(201).json({ success: true, message: 'Essen erfolgreich hinzugefügt', essen: neuesEssen });
 });
 
@@ -43,12 +42,22 @@ app.get('/api/essen', (req, res) => {
   res.json(essen);
 });
 
+
 app.put('/api/essen/:id', (req, res) => {
-  // Eintrag bearbeiten
+  const id = parseInt(req.params.id);
+  const index = essen.findIndex(e => e.id === id);
+  if (index !== -1) {
+    essen[index] = { ...essen[index], ...req.body };
+    res.json({ success: true, essen: essen[index] });
+  } else {
+    res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+  }
 });
 
 app.delete('/api/essen/:id', (req, res) => {
-  // Eintrag löschen
+  const id = parseInt(req.params.id);
+  essen = essen.filter(e => e.id !== id);
+  res.json({ success: true, message: 'Essen erfolgreich gelöscht' });
 });
 
 app.get('/api/essensplan/:week', (req, res) => {
