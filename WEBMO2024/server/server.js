@@ -68,6 +68,6 @@ app.post('/api/essensplan/:week', (req, res) => {
   // Essensplan speichern
 });
 
-app.listen(3000, () => {
-  console.log('Server läuft auf Port 3000');
+app.listen(3001, () => {
+  console.log('Server läuft auf Port 3001');
 });
