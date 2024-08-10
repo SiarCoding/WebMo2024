@@ -1,4 +1,4 @@
-# Essen-Verwaltungs-App
+# WEBMO2024 Essen-Verwaltungs-App
 
 Dies ist eine einfache Vue.js-Anwendung zur Verwaltung eines Essensplans. Die App ermöglicht es Benutzern, neue Gerichte hinzuzufügen, anzuzeigen und in einer Liste zu verwalten.
 
@@ -43,4 +43,4 @@ Die Essen-Verwaltungs-App bietet eine benutzerfreundliche Oberfläche zur Verwal
 
 1. Klone das Repository:
    ```bash
-   git clone https://github.com/dein-benutzername/essen-verwaltungs-app.git
+   git clone https://github.com/SiarCoding/WebMo2024.git
