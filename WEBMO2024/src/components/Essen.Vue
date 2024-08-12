@@ -11,7 +11,7 @@
             <p class="badge bg-info">{{ item.art }}</p>
           </div>
           <div class="card-footer d-flex justify-content-between">
-            <button @click="editEssen(item)" class="btn btn-primary">Bearbeiten</button>
+            <button @click="goToEditPage(item)" class="btn btn-primary">Bearbeiten</button>
             <button @click="deleteEssen(item.id)" class="btn btn-danger">Löschen</button>
           </div>
         </div>
@@ -21,15 +21,12 @@
 </template>
 
 <script>
-import AddEssen from './AddEssen.vue';
 import axios from 'axios';
 
 export default {
-  components: { AddEssen },
   data() {
     return {
       essenList: [],
-      selectedEssen: null,
     };
   },
   methods: {
@@ -41,9 +38,6 @@ export default {
         console.error('Fehler beim Laden der Essen:', error);
       }
     },
-    addEssen(neuesEssen) {
-      this.essenList.push(neuesEssen);
-    },
     async deleteEssen(id) {
       try {
         await axios.delete(`http://localhost:3001/api/essen/${id}`);
@@ -52,16 +46,8 @@ export default {
         console.error('Fehler beim Löschen des Essens:', error);
       }
     },
-    async updateEssen(essen) {
-      try {
-        await axios.put(`http://localhost:3001/api/essen/${essen.id}`, essen);
-        this.loadEssen(); // Nach dem Update die Liste neu laden
-      } catch (error) {
-        console.error('Fehler beim Aktualisieren des Essens:', error);
-      }
-    },
-    editEssen(essen) {
-      this.selectedEssen = { ...essen };
+    goToEditPage(item) {
+      this.$router.push(`/essen/edit/${item.id}`);
     },
   },
   created() {
@@ -110,5 +96,4 @@ h2.title {
   text-align: center;
   margin-bottom: 20px;
 }
-
 </style>

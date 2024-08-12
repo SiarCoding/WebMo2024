@@ -1,20 +1,20 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center">Neues Essen hinzufügen</h2>
-    <form @submit.prevent="hinzufuegen" class="card p-4 shadow-sm">
+    <h2 class="mb-4 text-center">
+      🍽️ Neues Essen hinzufügen
+    </h2>
+    <form @submit.prevent="hinzufuegen" class="card p-4 shadow-sm" style="background-color: #e3f2fd;">
       <div class="mb-3">
         <label for="name" class="form-label">Name:</label>
         <input type="text" v-model="essen.name" class="form-control" id="name" required />
       </div>
 
       <div class="mb-3">
-        <label for="beschreibung" class="form-label">Beschreibung:</label>
-        <input type="text" v-model="essen.beschreibung" class="form-control" id="beschreibung" required />
-      </div>
-
-      <div class="mb-3">
         <label for="preis" class="form-label">Preis:</label>
-        <input type="number" v-model="essen.preis" class="form-control" id="preis" required />
+        <div class="input-group">
+          <input type="number" step="0.01" v-model="essen.preis" class="form-control" id="preis" required />
+          <span class="input-group-text">€</span>
+        </div>
       </div>
 
       <div class="mb-4">
@@ -41,7 +41,6 @@ export default {
     return {
       essen: {
         name: '',
-        beschreibung: '',
         preis: 0,
         art: ''  // Neues Feld für die Art des Essens
       },
@@ -50,29 +49,28 @@ export default {
   },
   methods: {
     async hinzufuegen() {
-  console.log('Essen hinzufügen gestartet');
-  // Einfache Validierung vor dem Senden
-  if (!this.essen.name || !this.essen.beschreibung || this.essen.preis <= 0 || !this.essen.art) {
-    this.message = 'Bitte alle Felder korrekt ausfüllen!';
-    return;
-  }
+      console.log('Essen hinzufügen gestartet');
+      // Einfache Validierung vor dem Senden
+      if (!this.essen.name || this.essen.preis <= 0 || !this.essen.art) {
+        this.message = 'Bitte alle Felder korrekt ausfüllen!';
+        return;
+      }
 
-  try {
-    const response = await axios.post('http://localhost:3001/api/essen', this.essen);  // Port auf 3001 ändern
-    console.log('Serverantwort:', response);
-    if (response.data.success) {
-      this.message = 'Essen erfolgreich hinzugefügt!';
-      this.$emit('essenAdded', response.data.essen);  // Neues Essen über ein Event melden
-      this.essen = { name: '', beschreibung: '', preis: 0, art: '' };  // Formular zurücksetzen
-    } else {
-      this.message = 'Fehler beim Hinzufügen des Essens';
+      try {
+        const response = await axios.post('http://localhost:3001/api/essen', this.essen);  // Port auf 3001 ändern
+        console.log('Serverantwort:', response);
+        if (response.data.success) {
+          this.message = 'Essen erfolgreich hinzugefügt!';
+          this.$emit('essenAdded', response.data.essen);  // Neues Essen über ein Event melden
+          this.essen = { name: '', preis: 0, art: '' };  // Formular zurücksetzen
+        } else {
+          this.message = 'Fehler beim Hinzufügen des Essens';
+        }
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen des Essens:', error);
+        this.message = 'Serverfehler: ' + error.message;
+      }
     }
-  } catch (error) {
-    console.error('Fehler beim Hinzufügen des Essens:', error);
-    this.message = 'Serverfehler: ' + error.message;
-  }
-}
-
   }
 };
 </script>

@@ -44,7 +44,7 @@ app.get('/api/essen', (req, res) => {
 
 
 app.put('/api/essen/:id', (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id);  // Stellen Sie sicher, dass die ID richtig interpretiert wird
   const index = essen.findIndex(e => e.id === id);
   if (index !== -1) {
     essen[index] = { ...essen[index], ...req.body };
@@ -53,6 +53,18 @@ app.put('/api/essen/:id', (req, res) => {
     res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
   }
 });
+
+
+app.get('/api/essen/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const einzelnesEssen = essen.find(e => e.id === id);
+  if (einzelnesEssen) {
+    res.json(einzelnesEssen);
+  } else {
+    res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+  }
+});
+
 
 app.delete('/api/essen/:id', (req, res) => {
   const id = parseInt(req.params.id);
