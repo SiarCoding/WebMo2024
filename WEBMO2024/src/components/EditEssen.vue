@@ -1,3 +1,5 @@
+<!--Das Bearbeiten der gespeicherten Esseneinträge findet hier statt (/edit-essen) Das heißt nach dem Bearbeiten Klick kommt man auf das edit-Essen. Verwendet wird hier Bootstrap. Im Templete kommt der HTML Code Abschnitt!
+Den <script> nutzen wir für Syntax!!!-->
 <template>
     <div class="container mt-5">
       <h2 class="mb-4 text-center">🍽️ Essen bearbeiten</h2>
@@ -38,7 +40,7 @@
     data() {
       return {
         essen: {
-          name: '',
+          name: '', //hier kommen die selben Dateneinträge wie bei AddEssen.vue, da wir logischerweise die Änderungen anhand der gespeicherten Daten vornehmen.
           preis: 0,
           art: ''
         },
@@ -48,10 +50,10 @@
     async created() {
       const id = this.$route.params.id;
       try {
-        const response = await axios.get(`http://localhost:3001/api/essen/${id}`);
+        const response = await axios.get(`http://localhost:3001/api/essen/${id}`); //Zugriff auf die API-Endpoint von Essenseinträgen Anhand der ID
         this.essen = response.data;
       } catch (error) {
-        console.error('Fehler beim Laden des Essens:', error);
+        console.error('Fehler beim Laden des Essens:', error); //FEHLERMELDUNG
       }
     },
     methods: {

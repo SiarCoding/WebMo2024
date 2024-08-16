@@ -1,3 +1,5 @@
+<!--Hier kommt die LOGIN Seite (/login). Verwendet wird hier kein Bootstrap für das Design. Im Templete kommt der HTML Code Abschnitt!
+Den <script> nutzen wir für Syntax!!!-->
 <template>
   <div class="login-container">
     <h2>Login</h2>
@@ -19,38 +21,41 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'; // Zuerst wird die axios-Bibliothek importiert, die für HTTP-Anfragen genutzt wird um daten zu senden an den server
 
 export default {
-  data() {
+  data() { //nun können wir mit data() die daten per default definieren. In dem fall haben wir hier leere Stringkette!
     return {
       username: '',
       password: '',
-      errorMessage: '',  // Für Fehlermeldungen
+      errorMessage: '',  // Für Fehlermeldungen relevant
     };
   },
-  methods: {
-    async login() {
+  methods: { // hier werden jegliche Methoden definiert fürs Templete
+    async login() { //die login funktion/methode kommt nun
       try {
-        const response = await axios.post('http://localhost:3000/login', {
-          username: this.username,
-          password: this.password,
+        const response = await axios.post('http://localhost:3000/login', { //wir senden einen POST-Request an den Server
+          username: this.username, //username = username
+          password: this.password, //password = password
         });
 
-        if (response.data.success) {
-          alert('Login erfolgreich!');
+        if (response.data.success) { //falls wir erfolgreich sind
+          alert('Login erfolgreich!'); //bekommen wir diese Meldung
           // Weiterleitung oder andere Aktionen
         } else {
-          this.errorMessage = 'Ungültige Anmeldedaten';
+          this.errorMessage = 'Ungültige Anmeldedaten'; //Falls nicht dann diese Error Message
         }
       } catch (error) {
-        this.errorMessage = 'Ein Fehler ist aufgetreten';
+        this.errorMessage = 'Ein Fehler ist aufgetreten'; //Mitteilung für ErrorMassage
         console.error('Login-Fehler:', error);
       }
     },
   },
 };
 </script>
+
+
+<!-- hier können wir nun bisschen css schreiben und das template designen. Andernfalls können wir auch hier Bootstrap verwenden im Templete und den Style Teil sparen!-->
 
 <style scoped>
 .login-container {

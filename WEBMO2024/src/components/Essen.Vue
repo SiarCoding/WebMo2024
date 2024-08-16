@@ -1,3 +1,5 @@
+<!--Das Anzeigen der Esseneinträge als Liste findet hier statt (/essen). Verwendet wird hier kein Bootstrap für das Design sondern übers style. Im Templete kommt der HTML Code Abschnitt!
+Den <script> nutzen wir für Syntax!!!-->
 <template>
   <div class="container mt-5">
     <h2 class="title mb-4 text-center">Essen Liste</h2>
@@ -11,8 +13,8 @@
             <p class="badge bg-info">{{ item.art }}</p>
           </div>
           <div class="card-footer d-flex justify-content-between">
-            <button @click="goToEditPage(item)" class="btn btn-primary">Bearbeiten</button>
-            <button @click="deleteEssen(item.id)" class="btn btn-danger">Löschen</button>
+            <button @click="goToEditPage(item)" class="btn btn-primary">Bearbeiten</button> <!--Button fürs Bearbeiten-->
+            <button @click="deleteEssen(item.id)" class="btn btn-danger">Löschen</button> <!--Button fürs Löschen-->
           </div>
         </div>
       </div>
@@ -21,32 +23,33 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'; // Zuerst wird die axios-Bibliothek importiert, die für HTTP-Anfragen genutzt wird um daten zu senden an den server
 
-export default {
+
+export default {//wir implementieren daten für das essen die relevant sind für die Liste
   data() {
     return {
-      essenList: [],
+      essenList: [], //in dem fall soll er einfach die Essensliste als Array zurückgeben von Server
     };
   },
-  methods: {
-    async loadEssen() {
+  methods: { //methoden kommen jetzt hier 
+    async loadEssen() { //Funktion für essen laden
       try {
-        const response = await axios.get('http://localhost:3001/api/essen');
-        this.essenList = response.data;
+        const response = await axios.get('http://localhost:3001/api/essen'); //GET Request senden an /api/essen 
+        this.essenList = response.data; //ESSENS LISTE WIEDERGEBEN!
       } catch (error) {
-        console.error('Fehler beim Laden der Essen:', error);
+        console.error('Fehler beim Laden der Essen:', error); // Error catchen
       }
     },
-    async deleteEssen(id) {
+    async deleteEssen(id) { // Funktion fürs Löschen des Esseneintrages basierend auf die ID
       try {
-        await axios.delete(`http://localhost:3001/api/essen/${id}`);
+        await axios.delete(`http://localhost:3001/api/essen/${id}`); // DELETE-Request senden an den jeweiligen ID
         this.loadEssen(); // Nach dem Löschen die Liste neu laden
       } catch (error) {
-        console.error('Fehler beim Löschen des Essens:', error);
+        console.error('Fehler beim Löschen des Essens:', error); // ERROR CATCHEN
       }
     },
-    goToEditPage(item) {
+    goToEditPage(item) { // hier gelangen wir direkt auf die EDIT SEITE !! Das heißt beim Klicken des Buttons gelangt man auf /edit-essen
       this.$router.push(`/essen/edit/${item.id}`);
     },
   },
@@ -56,6 +59,7 @@ export default {
 };
 </script>
 
+<!-- hier können wir nun bisschen css schreiben und das template designen. Andernfalls können wir auch hier Bootstrap verwenden im Templete und den Style Teil sparen!-->
 <style>
 .container {
   max-width: 1200px;
