@@ -9,7 +9,7 @@ app.use(cors());  // CORS wird nach der Initialisierung von 'app' verwendet
 
 // Beispiel-Benutzer (statisch)
 const users = [
-  { username: 'admin', password: 'admin123' }
+  { username: 'admin', password: 'admin1233' }
 ];
 
 let nextId = 1; // ID Zähler
