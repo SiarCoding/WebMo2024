@@ -1,7 +1,6 @@
 <template>
   <div class="container mt-5">
     <h2 class="title mb-4 text-center">Essen Liste</h2>
-    <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success mb-3">Neues Essen hinzufügen</button>
     <div class="row">
       <div class="col-md-4 mb-4" v-for="item in essenList" :key="item.id">
         <div class="card h-100">
@@ -10,10 +9,6 @@
             <h6 class="card-subtitle mb-2 text-muted">{{ item.preis }}€</h6>
             <p class="card-text">{{ item.beschreibung }}</p>
             <p class="badge bg-info">{{ item.art }}</p>
-          </div>
-          <div class="card-footer d-flex justify-content-between" v-if="isAdmin">
-            <button @click="goToEditPage(item)" class="btn btn-primary">Bearbeiten</button>
-            <button @click="deleteEssen(item.id)" class="btn btn-danger">Löschen</button>
           </div>
         </div>
       </div>
@@ -28,7 +23,6 @@ export default {
   data() {
     return {
       essenList: [],
-      isAdmin: false, // Zustand für Admin-Rechte
     };
   },
   methods: {
@@ -40,31 +34,15 @@ export default {
         console.error('Fehler beim Laden der Essen:', error);
       }
     },
-    async deleteEssen(id) {
-      try {
-        await axios.delete(`http://localhost:3001/api/essen/${id}`);
-        this.loadEssen();
-      } catch (error) {
-        console.error('Fehler beim Löschen des Essens:', error);
-      }
-    },
-    goToEditPage(item) {
-      this.$router.push(`/essen/edit/${item.id}`);
-    },
-    goToAddPage() {
-      this.$router.push('/add-essen');
-    },
   },
   created() {
     this.loadEssen();
-    this.isAdmin = localStorage.getItem('role') === 'admin'; // Überprüfen, ob der Benutzer ein Admin ist
   },
 };
 </script>
 
-<style scoped>
-/* Stil bleibt gleich */
-</style>
+
+
 
 <!-- hier können wir nun bisschen css schreiben und das template designen. Andernfalls können wir auch hier Bootstrap verwenden im Templete und den Style Teil sparen!-->
 <style>

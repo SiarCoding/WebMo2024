@@ -2,18 +2,24 @@
 // Wir verwenden dabei das Express-Framework, um HTTP-Serverfunktionen einfach und effizient zu erstellen und zu verwalten.
 
 const express = require('express'); //backend für node.js (Express)
-const bodyParser = require('body-parser'); // ein paket was ermöglicht HTTP-Anfragen zu parsen
+const bodyParser = require('body-parser'); // ermöglicht HTTP-Anfragen zu parsen
 const cors = require('cors');  // CORS wird hier definiert um Server Anfragen von anderen Domänen zu akzeptieren
 
 const app = express();  // Die App-Variable wird hier initialisiert!
 
 app.use(bodyParser.json());
-app.use(cors());  // CORS wird hier aktiviert!
+
+// Spezifische CORS-Konfiguration
+app.use(cors({
+  origin: 'http://localhost:5173', // Erlaubt Anfragen nur von deiner Frontend-URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Erlaubt nur diese HTTP-Methoden
+  credentials: true // Erlaubt das Senden von Cookies oder Authentifizierungsdaten
+}));
 
 // Beispiel-Daten für Admin Zugang
 const users = [
-  { username: 'admin', password: 'admin123' }, //beispiel Daten für Admin
-  { username: 'user', password: 'user123' } //beispiel Daten für User 
+  { username: 'admin', password: 'admin123' }, // Beispiel-Daten für Admin
+  { username: 'user', password: 'user123' } // Beispiel-Daten für User 
 ];
 
 let nextId = 1; // counter definieren
