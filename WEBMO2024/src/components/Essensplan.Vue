@@ -1,16 +1,18 @@
+<!--Hier kommt die Essensplan Erstellen Seite (/essensplan). Verwendet wird hier kein Bootstrap für das Design. Im Templete kommt der HTML Code Abschnitt!
+Den <script> nutzen wir für Syntax!!!-->
 <template>
   <div class="essen-plan-container">
-    <h2>Essensplan für Woche {{ selectedWeek }}</h2>
+    <h2>Essensplan für Woche {{ selectedWeek }}</h2> <!-- gewählte woche wird angezeigt -->
     
     <div class="week-selector">
-      <label for="week-select">Woche auswählen:</label>
+      <label for="week-select">Woche auswählen:</label> <!-- woche über dropdown auswählen -->
       <select id="week-select" v-model="selectedWeek">
         <option v-for="week in 8" :key="week" :value="week">Woche {{ week }}</option>
       </select>
     </div>
 
     <div class="days-container">
-      <div class="day" v-for="day in ['Mo', 'Di', 'Mi', 'Do', 'Fr']" :key="day">
+      <div class="day" v-for="day in ['Mo', 'Di', 'Mi', 'Do', 'Fr']" :key="day"> <!-- Wochentage -->
         <h3>{{ day }}</h3>
         <select v-model="plan[day]">
           <option v-for="essen in essenList" :key="essen.id" :value="essen.id">{{ essen.name }}</option>
@@ -18,18 +20,18 @@
       </div>
     </div>
 
-    <button class="save-button" @click="savePlan">Plan speichern</button>
+    <button class="save-button" @click="savePlan">Plan speichern</button> <!-- Button fürs Speichern des Planes -->
   </div>
 </template>
 
 <script>
 export default {
-  data() {
+  data() { // daten definition per default 
     return {
-      selectedWeek: 1,
+      selectedWeek: 1, //woche 1 per default gewählt
       essenList: [],
       plan: {
-        Mo: null,
+        Mo: null, // Die Wochentage enthalten kein Essen per default und sind erstmal als NULL definiert
         Di: null,
         Mi: null,
         Do: null,
@@ -39,18 +41,18 @@ export default {
   },
   methods: {
     loadEssen() {
-      // Essen vom Server laden
+      // Essen vom Server laden (NOCH NICHT ANGEFANGEN)
     },
     loadPlan() {
-      // Plan für die ausgewählte Woche vom Server laden
+      // Plan für die ausgewählte Woche vom Server laden (NOCH NICHT ANGEFANGEN)
     },
     savePlan() {
-      // Plan auf dem Server speichern
+      // Plan auf dem Server speichern (NOCH NICHT ANGEFANGEN)
     },
   },
   watch: {
     selectedWeek() {
-      this.loadPlan();
+      this.loadPlan(); //hier schauen wir für die Ausgewählte Woche die Essenseinträge 
     },
   },
   created() {

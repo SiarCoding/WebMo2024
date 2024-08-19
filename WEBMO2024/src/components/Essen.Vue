@@ -1,68 +1,57 @@
+<!--Das Anzeigen der Esseneinträge als Liste findet hier statt (/essen). Verwendet wird hier kein Bootstrap für das Design sondern übers style. Im Templete kommt der HTML Code Abschnitt!
+Den <script> nutzen wir für Syntax!!!-->
 <template>
-  <div class="essen-container">
-    <!-- AddEssen-Komponente wird eingebunden -->
-    <AddEssen @essenAdded="addEssen" />
-    <h2 class="title">Essen Liste</h2>
-    <ul class="essen-list">
-      <li v-for="item in essenList" :key="item.id" class="essen-item">
-        <div class="essen-details">
-          <span class="essen-name">{{ item.name }}</span>
-          <span class="essen-price">{{ item.preis }}€</span>
-          <span class="essen-description">{{ item.beschreibung }}</span>
+  <div class="container mt-5">
+    <h2 class="title mb-4 text-center">Essen Liste</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4" v-for="item in essenList" :key="item.id">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ item.name }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ item.preis }}€</h6>
+            <p class="card-text">{{ item.beschreibung }}</p>
+            <p class="badge bg-info">{{ item.art }}</p>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <button @click="goToEditPage(item)" class="btn btn-primary">Bearbeiten</button> <!--Button fürs Bearbeiten-->
+            <button @click="deleteEssen(item.id)" class="btn btn-danger">Löschen</button> <!--Button fürs Löschen-->
+          </div>
         </div>
-        <div class="button-group">
-          <button @click="editEssen(item)" class="edit-button">Bearbeiten</button>
-          <button @click="deleteEssen(item.id)" class="delete-button">Löschen</button>
-        </div>
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import AddEssen from './AddEssen.vue';
-import axios from 'axios';
+import axios from 'axios'; // Zuerst wird die axios-Bibliothek importiert, die für HTTP-Anfragen genutzt wird um daten zu senden an den server
 
-export default {
-  components: { AddEssen },
+
+export default {//wir implementieren daten für das essen die relevant sind für die Liste
   data() {
     return {
-      essenList: [],
-      selectedEssen: null,
+      essenList: [], //in dem fall soll er einfach die Essensliste als Array zurückgeben von Server
     };
   },
-  methods: {
-    async loadEssen() {
+  methods: { //methoden kommen jetzt hier 
+    async loadEssen() { //Funktion für essen laden
       try {
-        const response = await axios.get('http://localhost:3000/api/essen');
-        this.essenList = response.data;
+        const response = await axios.get('http://localhost:3001/api/essen'); //GET Request senden an /api/essen 
+        this.essenList = response.data; //ESSENS LISTE WIEDERGEBEN!
       } catch (error) {
-        console.error('Fehler beim Laden der Essen:', error);
+        console.error('Fehler beim Laden der Essen:', error); // Error catchen
       }
     },
-    editEssen(essen) {
-      this.selectedEssen = { ...essen };
-    },
-    async deleteEssen(id) {
+    async deleteEssen(id) { // Funktion fürs Löschen des Esseneintrages basierend auf die ID
       try {
-        await axios.delete(`http://localhost:3000/api/essen/${id}`);
+        await axios.delete(`http://localhost:3001/api/essen/${id}`); // DELETE-Request senden an den jeweiligen ID
         this.loadEssen(); // Nach dem Löschen die Liste neu laden
       } catch (error) {
-        console.error('Fehler beim Löschen des Essens:', error);
+        console.error('Fehler beim Löschen des Essens:', error); // ERROR CATCHEN
       }
     },
-    async updateEssen(essen) {
-      try {
-        await axios.put(`http://localhost:3000/api/essen/${essen.id}`, essen);
-        this.loadEssen(); // Nach dem Update die Liste neu laden
-      } catch (error) {
-        console.error('Fehler beim Aktualisieren des Essens:', error);
-      }
+    goToEditPage(item) { // hier gelangen wir direkt auf die EDIT SEITE !! Das heißt beim Klicken des Buttons gelangt man auf /edit-essen
+      this.$router.push(`/essen/edit/${item.id}`);
     },
-    addEssen(neuesEssen) {
-      console.log("Neues Essen hinzugefügt", neuesEssen);
-      this.essenList.push(neuesEssen);
-    }
   },
   created() {
     this.loadEssen(); // Beim Laden der Seite die Essensliste abrufen
@@ -70,91 +59,45 @@ export default {
 };
 </script>
 
-<style scoped>
-.essen-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+<!-- hier können wir nun bisschen css schreiben und das template designen. Andernfalls können wir auch hier Bootstrap verwenden im Templete und den Style Teil sparen!-->
+<style>
+.container {
+  max-width: 1200px;
 }
 
-.title {
-  font-size: 26px;
-  margin-bottom: 20px;
-  color: #2c3e50;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 10px;
+.card {
+  transition: transform 0.2s ease-in-out;
 }
 
-.essen-list {
-  list-style: none;
-  padding: 0;
+.card:hover {
+  transform: scale(1.05);
 }
 
-.essen-item {
-  background: #f4f4f4;
-  padding: 15px;
-  margin-bottom: 20px; /* Abstand zwischen den Listenelementen */
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column; /* Elemente untereinander anordnen */
-}
-
-.essen-details {
-  margin-bottom: 15px; /* Abstand zwischen den Details und den Buttons */
-}
-
-.essen-name {
-  display: block;
+.card-title {
+  font-size: 1.25rem;
   font-weight: bold;
-  color: #34495e;
-  margin-bottom: 5px; /* Abstand zwischen Name und Preis */
 }
 
-.essen-price {
-  display: block;
-  color: #e67e22;
-  margin-bottom: 5px; /* Abstand zwischen Preis und Beschreibung */
+.card-subtitle {
+  font-size: 1rem;
 }
 
-.essen-description {
-  display: block;
-  color: #7f8c8d;
+.card-text {
+  font-size: 0.9rem;
 }
 
-.button-group {
-  display: flex;
-  gap: 10px;
+.badge {
+  font-size: 0.85rem;
 }
 
-.edit-button,
-.delete-button {
-  border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #fff;
-  transition: background-color 0.3s;
+.btn {
+  font-size: 0.85rem;
 }
 
-.edit-button {
-  background-color: #2ecc71;
-}
-
-.edit-button:hover {
-  background-color: #27ae60;
-}
-
-.delete-button {
-  background-color: #e74c3c;
-}
-
-.delete-button:hover {
-  background-color: #c0392b;
+h2.title {
+  font-size: 2rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
 }
 </style>
