@@ -1,5 +1,3 @@
-<!--Hier kommt die LOGIN Seite (/login). Verwendet wird hier kein Bootstrap für das Design. Im Templete kommt der HTML Code Abschnitt!
-Den <script> nutzen wir für Syntax!!!-->
 <template>
   <div class="login-container">
     <h2>Login</h2>
@@ -21,38 +19,53 @@ Den <script> nutzen wir für Syntax!!!-->
 </template>
 
 <script>
-import axios from 'axios'; // Zuerst wird die axios-Bibliothek importiert, die für HTTP-Anfragen genutzt wird um daten zu senden an den server
+import axios from 'axios';
 
 export default {
-  data() { //nun können wir mit data() die daten per default definieren. In dem fall haben wir hier leere Stringkette!
+  data() {
     return {
       username: '',
       password: '',
-      errorMessage: '',  // Für Fehlermeldungen relevant
+      errorMessage: '',
     };
   },
-  methods: { // hier werden jegliche Methoden definiert fürs Templete
-    async login() { //die login funktion/methode kommt nun
+  methods: {
+    async login() {
       try {
-        const response = await axios.post('http://localhost:3000/login', { //wir senden einen POST-Request an den Server
-          username: this.username, //username = username
-          password: this.password, //password = password
+        const response = await axios.post('http://localhost:3001/login', {
+          username: this.username,
+          password: this.password,
         });
 
-        if (response.data.success) { //falls wir erfolgreich sind
-          alert('Login erfolgreich!'); //bekommen wir diese Meldung
-          // Weiterleitung oder andere Aktionen
+        if (response.data.success) {
+          alert('Login erfolgreich!');
+          if (this.username === 'admin') {
+            // Speichere die Admin-Rolle
+            localStorage.setItem('role', 'admin');
+            // Weiterleitung zur Admin-Essen-Seite
+            this.$router.push('/essen');
+          } else {
+            // Speichere die User-Rolle
+            localStorage.setItem('role', 'user');
+            // Weiterleitung zur User-Ansicht der Essensliste
+            this.$router.push('/essen-user');
+          }
         } else {
-          this.errorMessage = 'Ungültige Anmeldedaten'; //Falls nicht dann diese Error Message
+          this.errorMessage = 'Ungültige Anmeldedaten';
         }
       } catch (error) {
-        this.errorMessage = 'Ein Fehler ist aufgetreten'; //Mitteilung für ErrorMassage
+        this.errorMessage = 'Ein Fehler ist aufgetreten';
         console.error('Login-Fehler:', error);
       }
     },
   },
 };
 </script>
+
+<style scoped>
+/* Stil bleibt gleich */
+</style>
+
 
 
 <!-- hier können wir nun bisschen css schreiben und das template designen. Andernfalls können wir auch hier Bootstrap verwenden im Templete und den Style Teil sparen!-->
