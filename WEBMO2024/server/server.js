@@ -4,6 +4,7 @@
 const express = require('express'); //backend für node.js (Express)
 const bodyParser = require('body-parser'); // ermöglicht HTTP-Anfragen zu parsen
 const cors = require('cors');  // CORS wird hier definiert um Server Anfragen von anderen Domänen zu akzeptieren
+const pool = require('./db'); //Datenbank wird herrgestellt
 
 const app = express();  // Die App-Variable wird hier initialisiert!
 
@@ -82,6 +83,17 @@ app.delete('/api/essen/:id', (req, res) => {
   const id = parseInt(req.params.id); // hier wird id definiert
   essen = essen.filter(e => e.id !== id); // id wird im array solange gesucht bis es gefunden wird 
   res.json({ success: true, message: 'Essen erfolgreich gelöscht' }); // wenn der eintrag gelöscht gibt, er uns success zurück
+});
+
+app.get('/api/test-db', (req, res) => {
+  pool.query('SELECT NOW()', (err, result) => {
+    if (err) {
+      console.log('Fehler bei der Verbindung zur Datenbank', err);
+      res.status(500).json({success: false, message: 'Datenbankverbindung fehlgeschlagen'});
+    } else {
+      res.json({success: true, message: 'Datenbankverbindung herrgestellt', time: result.rows[0].now});
+    }
+  });
 });
 
 //GET Request: diese API-Route wird verwendet um das Essensplan für eine Woche abzurufen (Noch nicht implementiert)
