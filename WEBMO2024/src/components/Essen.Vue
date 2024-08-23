@@ -7,9 +7,9 @@
         <div class="card h-100">
           <div class="card-body">
             <h5 class="card-title">{{ item.name }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{{ item.preis }}€</h6>
+            <h6 class="card-subtitle mb-2 text-muted">{{ item.price }}€</h6>
             <p class="card-text">{{ item.beschreibung }}</p>
-            <p class="badge bg-info">{{ item.art }}</p>
+            <p class="badge bg-info">{{ item.type }}</p>
           </div>
           <div class="card-footer d-flex justify-content-between" v-if="isAdmin">
             <button @click="goToEditPage(item)" class="btn btn-primary">Bearbeiten</button>
@@ -66,7 +66,6 @@ export default {
 /* Stil bleibt gleich */
 </style>
 
-<!-- hier können wir nun bisschen css schreiben und das template designen. Andernfalls können wir auch hier Bootstrap verwenden im Templete und den Style Teil sparen!-->
 <style>
 .container {
   max-width: 1200px;

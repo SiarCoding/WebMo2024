@@ -1,20 +1,37 @@
 <template>
-  <div class="login-container">
-    <h2>Login</h2>
-    <form @submit.prevent="login" class="login-form">
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <input id="username" type="text" v-model="username" required />
-      </div>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="card-title text-center mb-4">Login</h2>
+            <form @submit.prevent="login" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="username" class="form-label">Username:</label>
+                <input id="username" type="text" v-model="username" class="form-control" required />
+              </div>
 
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input id="password" type="password" v-model="password" required />
-      </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <input id="password" type="password" v-model="password" class="form-control" required />
+              </div>
 
-      <button type="submit" class="login-button">Login</button>
-    </form>
-    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+              <div class="mb-3">
+                <label for="role" class="form-label">Role:</label>
+                <select id="role" v-model="role" class="form-select" required>
+                  <option value="">Select Role</option>
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+            <p v-if="errorMessage" class="text-danger text-center mt-3">{{ errorMessage }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -26,6 +43,7 @@ export default {
     return {
       username: '',
       password: '',
+      role: '',
       errorMessage: '',
     };
   },
@@ -35,23 +53,24 @@ export default {
         const response = await axios.post('http://localhost:3001/login', {
           username: this.username,
           password: this.password,
+          role: this.role,
         });
 
         if (response.data.success) {
           alert('Login erfolgreich!');
-          if (this.username === 'admin') {
-            // Speichere die Admin-Rolle
-            localStorage.setItem('role', 'admin');
+
+          // Speichere die Rolle des Benutzers
+          localStorage.setItem('role', response.data.role);
+
+          if (response.data.role === 'admin') {
             // Weiterleitung zur Admin-Essen-Seite
             this.$router.push('/essen');
           } else {
-            // Speichere die User-Rolle
-            localStorage.setItem('role', 'user');
             // Weiterleitung zur User-Ansicht der Essensliste
             this.$router.push('/essen-user');
           }
         } else {
-          this.errorMessage = 'Ungültige Anmeldedaten';
+          this.errorMessage = response.data.message;
         }
       } catch (error) {
         this.errorMessage = 'Ein Fehler ist aufgetreten';
@@ -63,87 +82,29 @@ export default {
 </script>
 
 <style scoped>
-/* Stil bleibt gleich */
-</style>
-
-
-
-<!-- hier können wir nun bisschen css schreiben und das template designen. Andernfalls können wir auch hier Bootstrap verwenden im Templete und den Style Teil sparen!-->
-
-<style scoped>
-.login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  font-family: 'Roboto', sans-serif;
-}
-
-h2 {
-  text-align: center;
-  color: #333;
-  font-size: 24px;
-  margin-bottom: 30px;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #555;
-  font-size: 14px;
-}
-
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.login-button {
-  padding: 12px;
-  background-color: #007bff;
-  color: #fff;
+/* Optional: Zusätzliche Stile für eine persönliche Note */
+.card {
+  background-color: #f9f9f9;
+  border-radius: 15px;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-  transition: background-color 0.3s ease;
 }
 
-.login-button:hover {
+.card-title {
+  font-weight: bold;
+  color: #333;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
   background-color: #0056b3;
+  border-color: #0056b3;
 }
 
-.error-message {
-  color: #ff4d4d;
-  text-align: center;
-  margin-top: 20px;
-  font-weight: 600;
-  font-size: 14px;
+.text-danger {
+  font-weight: bold;
 }
 </style>
