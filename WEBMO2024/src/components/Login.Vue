@@ -7,19 +7,19 @@
             <h2 class="card-title text-center mb-4">Login</h2>
             <form @submit.prevent="login" class="needs-validation" novalidate>
               <div class="mb-3">
-                <label for="username" class="form-label">Username:</label>
+                <label for="username" class="form-label">Benutzername:</label>
                 <input id="username" type="text" v-model="username" class="form-control" required />
               </div>
 
               <div class="mb-3">
-                <label for="password" class="form-label">Password:</label>
+                <label for="password" class="form-label">Passwort:</label>
                 <input id="password" type="password" v-model="password" class="form-control" required />
               </div>
 
               <div class="mb-3">
-                <label for="role" class="form-label">Role:</label>
+                <label for="role" class="form-label">Rolle:</label>
                 <select id="role" v-model="role" class="form-select" required>
-                  <option value="">Select Role</option>
+                  <option value="">Rolle wählen</option>
                   <option value="admin">Admin</option>
                   <option value="user">User</option>
                 </select>
@@ -49,6 +49,12 @@ export default {
   },
   methods: {
     async login() {
+      // Überprüfen, ob eine Rolle ausgewählt wurde
+      if (!this.role) {
+        this.errorMessage = 'Bitte wählen Sie eine Rolle aus.';
+        return;
+      }
+
       try {
         const response = await axios.post('http://localhost:3001/login', {
           username: this.username,
