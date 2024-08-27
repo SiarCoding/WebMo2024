@@ -8,6 +8,7 @@ import Essensplan from './components/Essensplan.vue';
 import Login from './components/Login.vue';
 import AddEssen from './components/AddEssen.vue';
 import EditEssen from './components/EditEssen.vue';
+import Plaene from './components/Plaene.vue';
 
 // Hier kommt die Definition der Pfade mit den jeweiligen Routen
 const routes = [
@@ -17,6 +18,7 @@ const routes = [
   { path: '/essen-user', component: EssenUser }, // essensliste für User
   { path: '/essensplan', component: Essensplan }, // essensplan
   { path: '/add-essen', component: AddEssen }, // essen hinzufügen
+  { path: '/plaene', component: Plaene }, // planuebersicht
   { path: '/essen/edit/:id', component: EditEssen, props: true }, // essen bearbeiten
 ];
 
