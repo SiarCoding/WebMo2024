@@ -149,7 +149,7 @@ app.get('/api/test-db', (req, res) => {
     }
   });
 });
-
+//API POST essensplan hinzufügen
 app.post('/api/essensplan', async (req, res) => {
   const { week_number, plan } = req.body;
 
@@ -220,14 +220,13 @@ app.get('/api/essensplan', async (req, res) => {
       LEFT JOIN essen e ON l.essen_id = e.id
       ORDER BY p.wochennummer, l.tag;
     `);
-    
+
     const plans = {};
 
-    // Initialisierung aller Wochentage und des Gesamtpreises
     result.rows.forEach(row => {
       if (!plans[row.wochennummer]) {
-        plans[row.wochennummer] = { 
-          week_number: row.wochennummer, 
+        plans[row.wochennummer] = {
+          week_number: row.wochennummer,
           days: {
             'Montag': null,
             'Dienstag': null,
@@ -244,7 +243,7 @@ app.get('/api/essensplan', async (req, res) => {
         plans[row.wochennummer].days[row.tag] = {
           meal_id: row.essen_id,
           meal_name: row.meal_name,
-          price: row.price
+          price: parseFloat(row.price)
         };
         plans[row.wochennummer].total_price += parseFloat(row.price);
       }
@@ -256,6 +255,8 @@ app.get('/api/essensplan', async (req, res) => {
     res.status(500).json({ success: false, message: 'Serverfehler beim Abrufen der Essenspläne' });
   }
 });
+
+
 
 app.put('/api/essensplan/:week', async (req, res) => {
   const week_number = req.params.week;
@@ -290,19 +291,19 @@ app.put('/api/essensplan/:week', async (req, res) => {
   }
 });
 
-app.delete('/api/essensplan/:week', async (req, res) => {
-  const { week } = req.params;
-  if (!week) {
-    res.status(400).json({ success: false, message: 'Ungültige Woche' });
-    return;
+app.delete('/api/essensplan/:id', async (req, res) => {
+  const { id } = req.params; // Nutze 'id' statt 'week'
+  
+  if (!id) {
+    return res.status(400).json({ success: false, message: 'Ungültige Plan-ID' });
   }
 
   try {
-    // Konvertiere den `week`-Parameter zu einer Ganzzahl, um sicherzustellen, dass er als Zahl behandelt wird.
-    const weekNumber = parseInt(week, 10);
+    // Konvertiere den `id`-Parameter zu einer Ganzzahl
+    const planId = parseInt(id, 10);
 
-    await pool.query('DELETE FROM essen_im_plan WHERE plan_id = $1', [weekNumber]);
-    await pool.query('DELETE FROM essensplan WHERE plan_id = $1', [weekNumber]);
+    await pool.query('DELETE FROM essen_im_plan WHERE plan_id = $1', [planId]);
+    await pool.query('DELETE FROM essensplan WHERE plan_id = $1', [planId]);
 
     res.json({ success: true, message: 'Essensplan erfolgreich gelöscht' });
   } catch (error) {
@@ -310,6 +311,7 @@ app.delete('/api/essensplan/:week', async (req, res) => {
     res.status(500).json({ success: false, message: 'Serverfehler beim Löschen des Essensplans' });
   }
 });
+
 
 
 
