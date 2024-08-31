@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       essenList: [],
-      isAdmin: false, // Zustand für Admin-Rechte
+      isAdmin: localStorage.getItem('role') === 'admin', // Überprüfen, ob der Benutzer ein Admin ist
     };
   },
   methods: {
@@ -49,7 +49,9 @@ export default {
       }
     },
     goToEditPage(item) {
-      this.$router.push(`/essen/edit/${item.id}`);
+      if (this.isAdmin) {
+        this.$router.push(`/essen/edit/${item.id}`);
+      }
     },
     goToAddPage() {
       this.$router.push('/add-essen');
@@ -57,10 +59,10 @@ export default {
   },
   created() {
     this.loadEssen();
-    this.isAdmin = localStorage.getItem('role') === 'admin'; // Überprüfen, ob der Benutzer ein Admin ist
   },
 };
 </script>
+
 
 <style scoped>
 /* Stil bleibt gleich */

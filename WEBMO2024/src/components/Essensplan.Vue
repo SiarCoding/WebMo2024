@@ -73,12 +73,12 @@ export default {
     },
     async loadPlan() {
       try {
-        const response = await axios.get(`http://localhost:3001/api/essensplan`);
+        const response = await axios.get('http://localhost:3001/api/essensplan');
         const plans = response.data;
 
         // Finden des aktuellen Plans basierend auf der ausgewählten Woche
         const currentPlan = plans.find(p => p.week_number == this.selectedWeek);
-        this.resetPlan(); // Reset the plan first
+        this.resetPlan(); // Plan zuerst zurücksetzen
         
         if (currentPlan) {
           for (const [day, meal] of Object.entries(currentPlan.days)) {
@@ -100,9 +100,27 @@ export default {
           meal_id: this.plan[day]
         }));
 
+        // Token abrufen und in den Header der Anfrage einfügen
+        const token = localStorage.getItem('token');
+        if (!token) {
+          this.errorMessage = 'Token fehlt. Bitte erneut einloggen.';
+          this.$router.push('/login');
+          return;
+        }
+
+        // Debugging: Überprüfen Sie, ob das Plan-Array korrekt ist
+        console.log('Plan-Daten vor dem Senden:', {
+          week_number: this.selectedWeek,
+          plan
+        });
+
         const response = await axios.post('http://localhost:3001/api/essensplan', {
           week_number: this.selectedWeek,
           plan
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
         });
 
         this.successMessage = response.data.message;
@@ -124,8 +142,8 @@ export default {
     }
   },
   mounted() {
-    this.loadEssen();
-    this.loadPlan();
+    this.loadEssen();  // Laden Sie die Liste der verfügbaren Mahlzeiten
+    this.loadPlan();    // Laden Sie den aktuellen Essensplan für die ausgewählte Woche
   }
 }
 </script>
