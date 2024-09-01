@@ -31,9 +31,10 @@
       </div>
     </div>
 
-    <!-- Save plan button -->
+    <!-- Buttons for save plan and view plans -->
     <div class="text-center">
-      <button class="btn btn-primary" @click="savePlan">Plan speichern</button>
+      <button class="btn btn-primary me-2" @click="savePlan">Plan speichern</button>
+      <button class="btn btn-secondary" @click="viewPlans">Essenspläne ansehen</button>
       <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
       <p v-if="successMessage" class="text-success mt-3">{{ successMessage }}</p>
     </div>
@@ -79,7 +80,7 @@ export default {
         // Finden des aktuellen Plans basierend auf der ausgewählten Woche
         const currentPlan = plans.find(p => p.week_number == this.selectedWeek);
         this.resetPlan(); // Plan zuerst zurücksetzen
-        
+
         if (currentPlan) {
           for (const [day, meal] of Object.entries(currentPlan.days)) {
             this.plan[day] = meal.meal_id;
@@ -131,6 +132,9 @@ export default {
         this.errorMessage = 'Fehler beim Speichern des Essensplans';
       }
     },
+    viewPlans() {
+      this.$router.push('/plaene'); // Navigation zur Seite mit allen Essensplänen
+    },
     resetPlan() {
       this.plan = {
         Montag: null,
@@ -160,5 +164,9 @@ export default {
 .text-danger,
 .text-success {
   font-weight: bold;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
 }
 </style>

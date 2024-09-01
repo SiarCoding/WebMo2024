@@ -1,7 +1,13 @@
 <template>
   <div class="container mt-5">
     <h2 class="title mb-4 text-center">Essen Liste</h2>
-    <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success mb-3">Neues Essen hinzufügen</button>
+    
+    <!-- Neue Buttons hinzufügen -->
+    <div class="d-flex justify-content-between mb-3">
+      <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success">Neues Essen hinzufügen</button>
+      <button @click="goToEssensplanPage" class="btn btn-primary">Essensplan erstellen</button>
+    </div>
+
     <div class="row">
       <div class="col-md-4 mb-4" v-for="item in essenList" :key="item.id">
         <div class="card h-100">
@@ -56,6 +62,9 @@ export default {
     goToAddPage() {
       this.$router.push('/add-essen');
     },
+    goToEssensplanPage() {
+      this.$router.push('/essensplan');
+    },
   },
   created() {
     this.loadEssen();
@@ -63,12 +72,7 @@ export default {
 };
 </script>
 
-
 <style scoped>
-/* Stil bleibt gleich */
-</style>
-
-<style>
 .container {
   max-width: 1200px;
 }
