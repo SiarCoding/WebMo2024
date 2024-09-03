@@ -1,0 +1,25 @@
+const jwt = require('jsonwebtoken');
+
+function verifyToken(req, res, next) {
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(403).json({ success: false, message: 'Kein Token vorhanden' });
+  }
+
+  jwt.verify(token.split(' ')[1], 'geheimnis', (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ success: false, message: 'Token ungültig' });
+    }
+    req.user = decoded;
+    next();
+  });
+}
+
+function verifyAdmin(req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ success: false, message: 'Nur Admins dürfen diese Aktion ausführen' });
+  }
+  next();
+}
+
+module.exports = { verifyToken, verifyAdmin };
