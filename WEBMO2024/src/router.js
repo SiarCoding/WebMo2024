@@ -1,9 +1,5 @@
-// Hier definieren wir unsere Routen!!
-
-// als erstes importieren wir unsere Komponenten aus dem components-Ordner
 import { createRouter, createWebHistory } from 'vue-router';
 import Essen from './components/Essen.vue';
-import EssenUser from './components/EssenUser.vue';
 import Essensplan from './components/Essensplan.vue';
 import Login from './components/Login.vue';
 import AddEssen from './components/AddEssen.vue';
@@ -14,7 +10,6 @@ const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
   { path: '/essen', component: Essen, meta: { requiresAuth: true } },
-  { path: '/essen-user', component: EssenUser, meta: { requiresAuth: true } },
   { path: '/essensplan', component: Essensplan, meta: { requiresAuth: true } },
   { path: '/add-essen', component: AddEssen, meta: { requiresAuth: true } },
   { path: '/plaene', component: Plaene, meta: { requiresAuth: true } },
@@ -40,4 +35,3 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
-

@@ -3,10 +3,9 @@
   <div class="container mt-5">
     <h2 class="title mb-4 text-center">{{ $t('pages.essen_list') }}</h2>
     
-    <!-- Neue Buttons hinzufügen -->
     <div class="d-flex justify-content-between mb-3">
-      <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success">{{ $t('pages.add_food') }}</button>
       <button @click="goToEssensplanPage" class="btn btn-primary">{{ $t('pages.create_meal_plan') }}</button>
+      <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success">{{ $t('pages.add_food') }}</button>
     </div>
 
     <div class="row">
@@ -36,24 +35,48 @@ export default {
   data() {
     return {
       essenList: [],
-      isAdmin: localStorage.getItem('role') === 'admin', // Überprüfen, ob der Benutzer ein Admin ist
+      isAdmin: localStorage.getItem('role') === 'admin',
     };
   },
   methods: {
     async loadEssen() {
       try {
+        console.log('Lade Daten von Backend...');
         const response = await axios.get('http://localhost:3001/api/essen');
+        console.log('Daten von Backend erhalten:', response.data);
         this.essenList = response.data;
       } catch (error) {
         console.error('Fehler beim Laden der Essen:', error);
+        if (error.response) {
+          console.error('Fehlerdaten:', error.response.data);
+        }
       }
     },
     async deleteEssen(id) {
       try {
-        await axios.delete(`http://localhost:3001/api/essen/${id}`);
-        this.loadEssen();
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('Token fehlt. Bitte melden Sie sich erneut an.');
+          this.$router.push('/login');
+          return;
+        }
+        
+        const response = await axios.delete(`http://localhost:3001/api/essen/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data.success) {
+          this.message = 'Essen erfolgreich gelöscht!';
+          this.loadEssen();
+        } else {
+          this.message = response.data.message;
+        }
+
       } catch (error) {
         console.error('Fehler beim Löschen des Essens:', error);
+        this.message = 'Fehler beim Löschen des Essens';
       }
     },
     goToEditPage(item) {
@@ -64,6 +87,7 @@ export default {
     goToAddPage() {
       this.$router.push('/add-essen');
     },
+
     goToEssensplanPage() {
       this.$router.push('/essensplan');
     },
@@ -94,6 +118,7 @@ export default {
 
 .card {
   transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
@@ -109,16 +134,13 @@ export default {
   font-size: 1rem;
 }
 
-.card-text {
-  font-size: 0.9rem;
-}
-
 .badge {
   font-size: 0.85rem;
 }
 
 .btn {
   font-size: 0.85rem;
+  margin-right: 5px;
 }
 
 h2.title {
@@ -126,5 +148,9 @@ h2.title {
   color: #333;
   text-align: center;
   margin-bottom: 20px;
+}
+
+.alert {
+  margin-top: 10px;
 }
 </style>
