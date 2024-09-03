@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5">
-    <h2 class="text-center mb-4">Essenspläne für 8 Wochen</h2>
+    <h2 class="title mb-4 text-center">Essenspläne für 8 Wochen</h2>
 
     <!-- Erfolg- und Fehlermeldungen -->
     <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
@@ -8,7 +8,7 @@
 
     <!-- Button zum Hinzufügen eines neuen Plans -->
     <div class="text-center mb-3">
-      <button class="btn btn-success" @click="addPlan">Plan hinzufügen</button>
+      <button class="btn btn-success" @click="addPlan">Essensplan hinzufügen</button>
     </div>
 
     <!-- Liste der Essenspläne -->
@@ -54,10 +54,7 @@ export default {
       try {
         const response = await axios.get('http://localhost:3001/api/essensplan');
         this.essensplaene = response.data;
-        console.log('Geladene Pläne:', this.essensplaene); // Debugging-Ausgabe
-        this.essensplaene.forEach(plan => {
-          console.log('Plan-ID:', plan.plan_id); // Debugging-Ausgabe
-        });
+        console.log('Geladene Pläne:', this.essensplaene);
       } catch (error) {
         console.error('Fehler beim Laden der Essenspläne:', error);
         this.errorMessage = 'Fehler beim Laden der Essenspläne';
@@ -65,10 +62,8 @@ export default {
     },
     async deletePlan(planId) {
       try {
-        console.log('deletePlan aufgerufen mit ID:', planId); // Debugging-Ausgabe
         if (!planId) {
           this.errorMessage = 'Ungültige Plan-ID. Bitte versuchen Sie es erneut.';
-          console.log('Ungültige Plan-ID:', planId); // Debugging-Ausgabe
           return;
         }
         await axios.delete(`http://localhost:3001/api/essensplan/${planId}`);
@@ -120,3 +115,10 @@ export default {
   margin-top: 20px;
 }
 </style>
+
+
+
+
+
+
+

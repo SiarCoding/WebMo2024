@@ -9,6 +9,7 @@ import Login from './components/Login.vue';
 import AddEssen from './components/AddEssen.vue';
 import EditEssen from './components/EditEssen.vue';
 import Plaene from './components/Plaene.vue';
+import EditEssensplan from './components/EditEssensplan.vue'; // Korrekt importieren
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -19,6 +20,7 @@ const routes = [
   { path: '/add-essen', component: AddEssen, meta: { requiresAuth: true } },
   { path: '/plaene', component: Plaene, meta: { requiresAuth: true } },
   { path: '/essen/edit/:id', component: EditEssen, props: true, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/essensplan/edit/:week', name: 'EditEssensplan', component: EditEssensplan, props: true, meta: { requiresAuth: true, requiresAdmin: true } }, // Korrekte Definition der Route
 ];
 
 const router = createRouter({
@@ -40,4 +42,5 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
+
 
