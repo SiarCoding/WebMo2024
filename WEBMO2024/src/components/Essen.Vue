@@ -1,11 +1,12 @@
+<!-- src/components/Essen.vue -->
 <template>
   <div class="container mt-5">
-    <h2 class="title mb-4 text-center">Essen Liste</h2>
+    <h2 class="title mb-4 text-center">{{ $t('pages.essen_list') }}</h2>
     
     <!-- Neue Buttons hinzufügen -->
     <div class="d-flex justify-content-between mb-3">
-      <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success">Neues Essen hinzufügen</button>
-      <button @click="goToEssensplanPage" class="btn btn-primary">Essensplan erstellen</button>
+      <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success">{{ $t('pages.add_food') }}</button>
+      <button @click="goToEssensplanPage" class="btn btn-primary">{{ $t('pages.create_meal_plan') }}</button>
     </div>
 
     <div class="row">
@@ -13,13 +14,14 @@
         <div class="card h-100">
           <div class="card-body">
             <h5 class="card-title">{{ item.name }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{{ item.price }}€</h6>
+            <h6 class="card-subtitle mb-2 text-muted">{{ $t('pages.food_price') }}: {{ item.price }}€</h6>
             <p class="card-text">{{ item.beschreibung }}</p>
-            <p class="badge bg-info">{{ item.type }}</p>
+            <!-- Dynamische Übersetzung des Typs -->
+            <p class="badge bg-info">{{ $t('pages.' + translateType(item.type)) }}</p>
           </div>
           <div class="card-footer d-flex justify-content-between" v-if="isAdmin">
-            <button @click="goToEditPage(item)" class="btn btn-primary">Bearbeiten</button>
-            <button @click="deleteEssen(item.id)" class="btn btn-danger">Löschen</button>
+            <button @click="goToEditPage(item)" class="btn btn-primary">{{ $t('pages.edit') }}</button>
+            <button @click="deleteEssen(item.id)" class="btn btn-danger">{{ $t('pages.delete') }}</button>
           </div>
         </div>
       </div>
@@ -65,6 +67,19 @@ export default {
     goToEssensplanPage() {
       this.$router.push('/essensplan');
     },
+    // Hilfsfunktion zur Übersetzung des Typs
+    translateType(type) {
+      switch(type) {
+        case 'mit Fleisch':
+          return 'meat';
+        case 'vegetarisch':
+          return 'vegetarian';
+        case 'vegan':
+          return 'vegan';
+        default:
+          return type; // Fallback, falls keine Übereinstimmung gefunden wird
+      }
+    }
   },
   created() {
     this.loadEssen();
