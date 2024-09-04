@@ -16,7 +16,8 @@
       <div v-for="plan in essensplaene" :key="plan.plan_id" class="col-md-6 mb-4">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Essensplan für Woche {{ plan.week_number }}</h5>
+            <!-- Stelle sicher, dass die richtige Variable verwendet wird -->
+            <h5 class="card-title">Essensplan für Woche {{ plan.wochennummer }}</h5> <!-- Ändere 'plan.week_number' zu 'plan.wochennummer' -->
             <ul class="list-group list-group-flush mb-3">
               <li v-for="(meal, day) in plan.days" :key="day" class="list-group-item">
                 <strong>{{ day }}:</strong>
@@ -80,7 +81,7 @@ export default {
       this.$router.push('/essensplan'); // Navigation zur Seite zum Hinzufügen eines neuen Plans
     },
     editPlan(plan) {
-      this.$router.push({ name: 'EditEssensplan', params: { week: plan.week_number } });
+      this.$router.push({ name: 'EditEssensplan', params: { week: plan.wochennummer } }); // Ändere 'plan.week_number' zu 'plan.wochennummer'
     }
   },
   created() {
@@ -115,10 +116,3 @@ export default {
   margin-top: 20px;
 }
 </style>
-
-
-
-
-
-
-

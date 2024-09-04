@@ -74,73 +74,74 @@ export default {
     },
     
     async loadPlan() {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/essensplan/${this.selectedWeek}`);
-        const currentPlan = response.data;
+  try {
+    const response = await axios.get(`http://localhost:3001/api/essensplan/${this.selectedWeek}`);
+    const currentPlan = response.data;
 
-        this.resetPlan(); // Plan zurücksetzen
+    this.resetPlan(); // Plan zurücksetzen
 
-        if (currentPlan) {
-          for (const [day, meal] of Object.entries(currentPlan.days)) {
-            this.plan[day] = meal ? meal.meal_id : null; 
-          }
-        }
-
-        console.log('Essensplan geladen:', this.plan);
-        this.errorMessage = ''; // Fehlernachricht löschen
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          this.resetPlan(); 
-          console.log(`Kein Essensplan für Woche ${this.selectedWeek} gefunden. Standardauswahl wird angezeigt.`);
-          this.errorMessage = ''; 
-        } else {
-          this.errorMessage = 'Fehler beim Laden des Essensplans.';
-          console.error('Fehler beim Laden des Essensplans:', error);
-        }
+    if (currentPlan) {
+      for (const [day, meal] of Object.entries(currentPlan.days)) {
+        this.plan[day] = meal ? meal.essen_id : null; // Ändere 'meal_id' zu 'essen_id'
       }
-    },
+    }
+
+    console.log('Essensplan geladen:', this.plan);
+    this.errorMessage = ''; // Fehlernachricht löschen
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      this.resetPlan(); 
+      console.log(`Kein Essensplan für Woche ${this.selectedWeek} gefunden. Standardauswahl wird angezeigt.`);
+      this.errorMessage = ''; 
+    } else {
+      this.errorMessage = 'Fehler beim Laden des Essensplans.';
+      console.error('Fehler beim Laden des Essensplans:', error);
+    }
+  }
+},
+
 
     async savePlan() {
-      try {
-        const plan = Object.keys(this.plan).map(day => ({
-          day_of_week: day,
-          meal_id: this.plan[day]
-        }));
+  try {
+    const plan = Object.keys(this.plan).map(day => ({
+      tag: day, // Ändere 'day_of_week' zu 'tag'
+      essen_id: this.plan[day] // Ändere 'meal_id' zu 'essen_id'
+    }));
 
-        const mealIds = plan.map(item => item.meal_id);
-        const uniqueMeals = new Set(mealIds);
+    const mealIds = plan.map(item => item.essen_id);
+    const uniqueMeals = new Set(mealIds);
 
-        if (uniqueMeals.size !== mealIds.length) {
-          this.errorMessage = 'Ein Essensplan darf nicht dasselbe Gericht mehr als einmal pro Woche anbieten.';
-          return;
-        }
+    if (uniqueMeals.size !== mealIds.length) {
+      this.errorMessage = 'Ein Essensplan darf nicht dasselbe Gericht mehr als einmal pro Woche anbieten.';
+      return;
+    }
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-          this.errorMessage = 'Token fehlt. Bitte erneut einloggen.';
-          this.$router.push('/login');
-          return;
-        }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.errorMessage = 'Token fehlt. Bitte erneut einloggen.';
+      this.$router.push('/login');
+      return;
+    }
 
-        const response = await axios.post('http://localhost:3001/api/essensplan', {
-          week_number: this.selectedWeek,
-          plan
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
-        });
-
-        this.successMessage = response.data.message;
-        this.errorMessage = ''; // Lösche die Fehlermeldung, falls vorhanden
-        console.log('Essensplan gespeichert:', response.data);
-        this.loadPlan();
-      } catch (error) {
-        console.error('Fehler beim Speichern des Essensplans:', error);
-        this.errorMessage = error.response?.data?.message || 'Fehler beim Speichern des Essensplans';
+    const response = await axios.post('http://localhost:3001/api/essensplan', {
+      wochennummer: this.selectedWeek, // Ändere 'week_number' zu 'wochennummer'
+      plan
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       }
-    },
-    
+    });
+
+    this.successMessage = response.data.message;
+    this.errorMessage = ''; // Lösche die Fehlermeldung, falls vorhanden
+    console.log('Essensplan gespeichert:', response.data);
+    this.loadPlan();
+  } catch (error) {
+    console.error('Fehler beim Speichern des Essensplans:', error);
+    this.errorMessage = error.response?.data?.message || 'Fehler beim Speichern des Essensplans';
+  }
+},
+
     viewPlans() {
       this.$router.push('/plaene');
     },
