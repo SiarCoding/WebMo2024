@@ -1,20 +1,14 @@
 <template>
   <div class="container mt-5">
-    <h2 class="text-center mb-4">Essensplan für Woche {{ selectedWeek }}</h2>
+    <h2 class="text-center mb-4">Bearbeite Essensplan für Woche {{ selectedWeek }}</h2>
 
-    <!-- Woche auswählen -->
-    <div class="row justify-content-center mb-4">
-      <div class="col-md-6">
-        <label for="week-select" class="form-label">Woche auswählen:</label>
-        <select id="week-select" v-model="selectedWeek" class="form-select" @change="loadPlan">
-          <option v-for="week in 8" :key="week" :value="week">Woche {{ week }}</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Tages- und Essensauswahl -->
+    <!-- Day and meal selection -->
     <div class="row">
-      <div class="col-md-6 mb-3" v-for="day in ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag']" :key="day">
+      <div
+        class="col-md-6 mb-3"
+        v-for="(mealId, day) in plan"
+        :key="day"
+      >
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">{{ day }}</h5>
@@ -27,9 +21,9 @@
       </div>
     </div>
 
-    <!-- Schaltflächen zum Speichern und Anzeigen der Pläne -->
+    <!-- Buttons for save plan and view plans -->
     <div class="text-center">
-      <button class="btn btn-primary me-2" @click="savePlan">Plan speichern</button>
+      <button class="btn btn-primary me-2" @click="saveEditedPlan">Plan speichern</button>
       <button class="btn btn-secondary" @click="viewPlans">Essenspläne ansehen</button>
       <p v-if="successMessage" class="text-success mt-3">{{ successMessage }}</p>
       <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
@@ -43,8 +37,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      selectedWeek: 1, // Standardmäßig Woche 1 ausgewählt
-      essenList: [], // Liste der verfügbaren Essen
+      selectedWeek: this.$route.params.week, // Die ausgewählte Woche aus den Routenparametern
+      essenList: [], // Liste der verfügbaren Mahlzeiten
       plan: {
         Montag: null,
         Dienstag: null,
@@ -58,17 +52,14 @@ export default {
   },
   methods: {
     async loadEssen() {
-      console.log('Essen-Liste wird geladen');
       try {
         const response = await axios.get('http://localhost:3001/api/essen');
         this.essenList = response.data;
-        console.log('Essen geladen:', this.essenList);
       } catch (error) {
-        console.error('Fehler beim Laden der Essen:', error);
         this.errorMessage = 'Fehler beim Laden der Essen';
       }
     },
-    
+
     async loadPlan() {
       try {
         const response = await axios.get(`http://localhost:3001/api/essensplan/${this.selectedWeek}`);
@@ -78,32 +69,26 @@ export default {
 
         if (currentPlan) {
           for (const [day, meal] of Object.entries(currentPlan.days)) {
-            this.plan[day] = meal ? meal.essen_id : null;
+            this.plan[day] = meal ? meal.essen_id : null; // Ändere 'meal_id' zu 'essen_id'
           }
         }
 
-        console.log('Essensplan geladen:', this.plan);
         this.errorMessage = ''; // Fehlernachricht löschen
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          this.resetPlan();
-          console.log(`Kein Essensplan für Woche ${this.selectedWeek} gefunden. Standardauswahl wird angezeigt.`);
-          this.errorMessage = '';
+          this.resetPlan(); 
+          this.errorMessage = ''; // Keine Fehlermeldung anzeigen
         } else {
           this.errorMessage = 'Fehler beim Laden des Essensplans.';
-          console.error('Fehler beim Laden des Essensplans:', error);
         }
       }
     },
 
-    async savePlan() {
-      this.errorMessage = ''; // Fehler- und Erfolgsmeldungen zurücksetzen
-      this.successMessage = '';
-
+    async saveEditedPlan() {
       try {
         const plan = Object.keys(this.plan).map(day => ({
-          tag: day,
-          essen_id: this.plan[day]
+          tag: day, // Ändere 'day_of_week' zu 'tag'
+          essen_id: this.plan[day] // Ändere 'meal_id' zu 'essen_id'
         }));
 
         const mealIds = plan.map(item => item.essen_id);
@@ -121,8 +106,9 @@ export default {
           return;
         }
 
-        const response = await axios.post('http://localhost:3001/api/essensplan', {
-          wochennummer: this.selectedWeek,
+        // PUT-Anfrage zum Speichern des bearbeiteten Essensplans
+        const response = await axios.put(`http://localhost:3001/api/essensplan/${this.selectedWeek}`, {
+          wochennummer: this.selectedWeek, // Ändere 'week_number' zu 'wochennummer'
           plan
         }, {
           headers: {
@@ -130,18 +116,16 @@ export default {
           }
         });
 
-        if (response.data.success) {
-          this.successMessage = response.data.message;
-          this.resetPlan(); // Plan zurücksetzen nach erfolgreichem Speichern
-        } else {
-          this.errorMessage = response.data.message;
-        }
+        this.successMessage = response.data.message;
+        this.errorMessage = ''; // Lösche die Fehlermeldung, falls vorhanden
+
+        // Lade den Plan erneut nach erfolgreichem Speichern
+        await this.loadPlan();
       } catch (error) {
-        console.error('Fehler beim Speichern des Essensplans:', error);
         this.errorMessage = error.response?.data?.message || 'Fehler beim Speichern des Essensplans';
       }
     },
-
+    
     viewPlans() {
       this.$router.push('/plaene');
     },
@@ -156,7 +140,7 @@ export default {
       };
     }
   },
-  
+
   mounted() {
     this.loadEssen();
     this.loadPlan();

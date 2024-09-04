@@ -1,29 +1,25 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const { Pool } = require('pg');
-const jwt = require('jsonwebtoken');
-const { verifyToken, verifyAdmin } = require('./middleware');
+const express = require('express'); // Express-Framework für HTTP-Server
+const bodyParser = require('body-parser'); // Middleware zum Parsen von Anfragen
+const cors = require('cors'); // Middleware für Cross-Origin Resource Sharing
+const pool = require('./db/db'); // Datenbankverbindung
 
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'webmo2024',
-  password: '123',
-  port: 5432,
-});
-
-const app = express();
+const app = express(); // Initialisierung der Express-Anwendung
 
 app.use(bodyParser.json());
 
+// Spezifische CORS-Konfiguration
 app.use(cors({
-  origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: 'http://localhost:5173', // Erlaubt Anfragen nur von dieser URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Erlaubt diese HTTP-Methoden
+  credentials: true // Erlaubt das Senden von Cookies oder Authentifizierungsdaten
 }));
 
+
+// Endpunkte für die API
+
 // POST-Route für Login
+const jwt = require('jsonwebtoken'); // JWT-Bibliothek
+
 app.post('/login', async (req, res) => {
   const { username, password, role } = req.body;
 
@@ -31,18 +27,20 @@ app.post('/login', async (req, res) => {
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     const user = result.rows[0];
 
+    // Überprüfen, ob Benutzer existiert und Anmeldedaten korrekt sind
     if (user && user.password === password && user.role === role) {
+      // Token generieren
       const token = jwt.sign(
-        { id: user.id, username: user.username, role: user.role },
-        'geheimnis',
-        { expiresIn: '1h' }
+        { id: user.id, username: user.username, role: user.role }, // Payload
+        'geheimnis', // Geheimnis zur Signierung des Tokens
+        { expiresIn: '1h' } // Ablaufzeit des Tokens
       );
 
       res.json({
         success: true,
         message: 'Login erfolgreich!',
         role: user.role,
-        token: token,
+        token: token, // Token in der Antwort zurückgeben
       });
     } else {
       res.status(401).json({ success: false, message: 'Ungültige Anmeldedaten oder falsche Rolle gewählt' });
@@ -52,6 +50,49 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ success: false, message: 'Serverfehler beim Login' });
   }
 });
+
+function generateToken(user) {
+  // Nutzen Sie eine Bibliothek wie jsonwebtoken, um ein JWT zu generieren
+  const jwt = require('jsonwebtoken');
+  const token = jwt.sign({ id: user.id, username: user.username }, 'geheimnis', { expiresIn: '1h' });
+  return token;
+}
+
+
+// POST-Route zum Hinzufügen von Essen
+// POST-Route zum Hinzufügen von Essen
+app.post('/api/essen', async (req, res) => {
+  const { name, preis, art } = req.body;
+
+  try {
+    // Überprüfen, ob das Gericht bereits existiert (Groß-/Kleinschreibung wird ignoriert)
+    const checkExist = await pool.query('SELECT * FROM essen WHERE LOWER(name) = LOWER($1)', [name]);
+    
+    if (checkExist.rows.length > 0) {
+      return res.status(400).json({ success: false, message: 'Das Gericht existiert bereits in der Liste.' });
+    }
+
+    // Gericht hinzufügen, wenn es noch nicht existiert
+    const result = await pool.query(
+      'INSERT INTO essen (name, price, type) VALUES ($1, $2, $3) RETURNING *', 
+      [name, preis, art]
+    );
+
+    const neuesEssen = result.rows[0];
+
+    res.status(201).json({ 
+      success: true, 
+      message: 'Essen erfolgreich hinzugefügt', 
+      essen: neuesEssen 
+    });
+
+  } catch (error) {
+    console.error('Fehler beim Hinzufügen des Essens:', error);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Hinzufügen des Essens' });
+  }
+});
+
+
 
 // GET-Route zum Abrufen aller Essen
 app.get('/api/essen', async (req, res) => {
@@ -64,81 +105,366 @@ app.get('/api/essen', async (req, res) => {
   }
 });
 
-// POST-Route zum Hinzufügen von Essen (nur für Admins)
-app.post('/api/essen', verifyToken, verifyAdmin, async (req, res) => {
+// PUT-Route zum Aktualisieren von Essen
+// PUT-Route zum Aktualisieren von Essen
+app.put('/api/essen/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ success: false, message: 'Ungültige ID' });
+  }
+
   const { name, preis, art } = req.body;
 
   try {
-    const countResult = await pool.query('SELECT COUNT(*) FROM essen');
-    const currentCount = parseInt(countResult.rows[0].count, 10);
-
-    if (currentCount >= 10) {
-      return res.status(400).json({ success: false, message: 'Darf nicht mehr als 10 sein.' });
-    }
-
     const result = await pool.query(
-      'INSERT INTO essen (name, price, type) VALUES ($1, $2, $3) RETURNING *',
-      [name, preis, art]
+      'UPDATE essen SET name = $1, price = $2, type = $3 WHERE id = $4 RETURNING *',
+      [name, preis, art, id]
     );
 
-    const neuesEssen = result.rows[0];
-    res.status(201).json({
-      success: true,
-      message: 'Essen erfolgreich hinzugefügt',
-      essen: neuesEssen
-    });
+    if (result.rows.length > 0) {
+      res.json({ success: true, essen: result.rows[0] });
+    } else {
+      res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+    }
 
   } catch (error) {
-    console.error('Fehler beim Hinzufügen des Essens:', error);
-    res.status(500).json({ success: false, message: 'Serverfehler beim Hinzufügen des Essens' });
+    console.error('Fehler beim Aktualisieren des Essens:', error.message);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Aktualisieren des Essens' });
   }
 });
+
+// GET-Route zum Abrufen eines bestimmten Essens
+app.get('/api/essen/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ success: false, message: 'Ungültige ID' });
+  }
+
+  try {
+    const result = await pool.query('SELECT * FROM essen WHERE id = $1', [id]);
+    const einzelnesEssen = result.rows[0];
+
+    if (einzelnesEssen) {
+      res.json(einzelnesEssen);
+    } else {
+      res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+    }
+  } catch (error) {
+    console.error('Fehler beim Abrufen des Essens:', error.message);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Abrufen des Essens' });
+  }
+});
+
+// DELETE-Route zum Löschen von Essen
+app.delete('/api/essen/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ success: false, message: 'Ungültige ID' });
+  }
+
+  try {
+    const result = await pool.query('DELETE FROM essen WHERE id = $1 RETURNING *', [id]);
+    const deletedEssen = result.rows[0];
+
+    if (deletedEssen) {
+      res.json({ success: true, message: 'Essen erfolgreich gelöscht', essen: deletedEssen });
+    } else {
+      res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+    }
+  } catch (error) {
+    console.error('Fehler beim Löschen des Essens:', error.message);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Löschen des Essens' });
+  }
+});
+
+
+// GET-Route zum Testen der Datenbankverbindung
+app.get('/api/test-db', (req, res) => {
+  pool.query('SELECT NOW()', (err, result) => {
+    if (err) {
+      console.log('Fehler bei der Verbindung zur Datenbank', err);
+      res.status(500).json({success: false, message: 'Datenbankverbindung fehlgeschlagen'});
+    } else {
+      res.json({success: true, message: 'Datenbankverbindung hergestellt', time: result.rows[0].now});
+    }
+  });
+});
+
+
+//API POST essensplan hinzufügen
+// POST-Route zum Hinzufügen eines neuen Essensplans
+
+// GET-Route zum Abrufen eines bestimmten Essensplans nach Woche
+// POST-Route zum Hinzufügen eines neuen Essensplans
+
+app.post('/api/essensplan', async (req, res) => {
+  const { wochennummer, plan } = req.body; 
+
+  console.log('Empfangene Daten:', { wochennummer, plan });
+
+  // Überprüfen, ob die Wochenzahl gültig ist
+  if (!wochennummer || wochennummer < 1 || wochennummer > 8) {
+    console.error('Ungültige Wochenzahl:', wochennummer);
+    return res.status(400).json({ success: false, message: 'Ungültige Wochenzahl. Bitte eine Woche zwischen 1 und 8 wählen.' });
+  }
+
+  try {
+    // Überprüfen, ob bereits ein Essensplan für diese Woche existiert
+    const checkExist = await pool.query(
+      'SELECT plan_id FROM essensplan WHERE wochennummer = $1',
+      [wochennummer]
+    );
+
+    if (checkExist.rows.length > 0) {
+      // Plan existiert bereits, Rückgabe einer Fehlermeldung
+      console.log('Essensplan für diese Woche existiert bereits:', wochennummer);
+      return res.status(400).json({ success: false, message: 'Ein Essensplan für diese Woche existiert bereits.' });
+    }
+
+    // Beginnen Sie die Transaktion
+    await pool.query('BEGIN');
+    console.log('Transaktion gestartet');
+
+    // Erstellen Sie einen neuen Essensplan und erhalten Sie die neue `plan_id`
+    const newPlan = await pool.query(
+      'INSERT INTO essensplan (wochennummer) VALUES ($1) RETURNING plan_id',
+      [wochennummer]
+    );
+
+    let mealPlanId;
+    if (newPlan.rows.length > 0) {
+      mealPlanId = newPlan.rows[0].plan_id;
+      console.log('Neue plan_id erstellt:', mealPlanId);
+    } else {
+      throw new Error('Fehler beim Erstellen des neuen Essensplans. plan_id konnte nicht abgerufen werden.');
+    }
+
+    // Überprüfen, ob das `plan`-Array vorhanden und nicht leer ist
+    if (!plan || !Array.isArray(plan) || plan.length === 0) {
+      throw new Error('Das Plan-Array ist leer oder ungültig.');
+    }
+
+    // Fügen Sie die neuen Einträge zur Tabelle `essen_im_plan` hinzu
+    for (const { tag, essen_id } of plan) {
+      console.log('Füge hinzu zu essen_im_plan:', { mealPlanId, essen_id, tag });
+
+      // Überprüfen, ob die tag und essen_id gültig sind
+      if (!tag || !essen_id) {
+        console.error('Ungültige Einträge: Tag oder Essen-ID fehlen:', { tag, essen_id });
+        throw new Error('Ungültige Einträge: Tag oder Essen-ID fehlen.');
+      }
+
+      await pool.query(
+        'INSERT INTO essen_im_plan (plan_id, essen_id, tag) VALUES ($1, $2, $3)',
+        [mealPlanId, essen_id, tag]
+      );
+    }
+
+    console.log('Alle Einfügungen abgeschlossen');
+
+    // Transaktion erfolgreich beenden
+    await pool.query('COMMIT');
+    console.log('Transaktion abgeschlossen und bestätigt');
+
+    res.status(201).json({ success: true, message: `Essensplan für Woche ${wochennummer} erfolgreich gespeichert` });
+  } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error('Fehler beim Speichern des Essensplans:', error.message, error.stack);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Speichern des Essensplans', error: error.message });
+  }
+});
+
 
 // GET-Route zum Abrufen aller Essenspläne
 app.get('/api/essensplan', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT week_number, json_agg(json_build_object('day_of_week', day_of_week, 'meal_id', meal_id)) AS days
-      FROM essensplan
-      GROUP BY week_number
-      ORDER BY week_number;
+      SELECT p.plan_id, p.wochennummer, l.tag, l.essen_id, e.name AS meal_name, e.price
+      FROM essensplan p
+      LEFT JOIN essen_im_plan l ON p.plan_id = l.plan_id
+      LEFT JOIN essen e ON l.essen_id = e.id
+      ORDER BY p.wochennummer, l.tag;
     `);
-    res.json(result.rows);
+
+    const plans = {};
+
+    result.rows.forEach(row => {
+      if (!plans[row.wochennummer]) {
+        plans[row.wochennummer] = {
+          plan_id: row.plan_id,
+          wochennummer: row.wochennummer, // Korrekte Verwendung der Variable
+          days: {
+            'Montag': null,
+            'Dienstag': null,
+            'Mittwoch': null,
+            'Donnerstag': null,
+            'Freitag': null
+          },
+          total_price: 0
+        };
+      }
+
+      if (row.tag && row.meal_name) {
+        plans[row.wochennummer].days[row.tag] = {
+          essen_id: row.essen_id,
+          meal_name: row.meal_name,
+          price: parseFloat(row.price)
+        };
+        plans[row.wochennummer].total_price += parseFloat(row.price);
+      }
+    });
+
+    res.json(Object.values(plans));
   } catch (error) {
     console.error('Fehler beim Abrufen der Essenspläne:', error);
     res.status(500).json({ success: false, message: 'Serverfehler beim Abrufen der Essenspläne' });
   }
 });
 
-// POST-Route zum Speichern des Essensplans
-app.post('/api/essensplan', verifyToken, verifyAdmin, async (req, res) => {
-  const { week_number, plan } = req.body;
+// GET-Route zum Abrufen eines bestimmten Essensplans nach Woche
+app.get('/api/essensplan/:week', async (req, res) => {
+  const wochennummer = parseInt(req.params.week, 10); // Korrekte Konvertierung
+
+  if (isNaN(wochennummer) || wochennummer < 1 || wochennummer > 8) {
+    return res.status(400).json({ success: false, message: 'Ungültige Wochenzahl.' });
+  }
 
   try {
-    if (!week_number) {
-      return res.status(400).json({ success: false, message: 'Wochennummer fehlt' });
+    const result = await pool.query(`
+      SELECT p.plan_id, p.wochennummer, l.tag, l.essen_id, e.name AS meal_name, e.price
+      FROM essensplan p
+      LEFT JOIN essen_im_plan l ON p.plan_id = l.plan_id
+      LEFT JOIN essen e ON l.essen_id = e.id
+      WHERE p.wochennummer = $1
+      ORDER BY l.tag;
+    `, [wochennummer]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: `Kein Essensplan für die ausgewählte Woche ${wochennummer} gefunden.` });
     }
 
-    for (const item of plan) {
-      const { day_of_week, meal_id } = item;
+    const plan = {
+      wochennummer: wochennummer,
+      days: {
+        Montag: null,
+        Dienstag: null,
+        Mittwoch: null,
+        Donnerstag: null,
+        Freitag: null
+      },
+      total_price: 0
+    };
 
-      await pool.query(
-        `INSERT INTO essensplan (week_number, day_of_week, meal_id)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (week_number, day_of_week)
-         DO UPDATE SET meal_id = EXCLUDED.meal_id;`,
-        [week_number, day_of_week, meal_id]
-      );
-    }
+    result.rows.forEach(row => {
+      if (row.tag && row.meal_name) {
+        plan.days[row.tag] = {
+          essen_id: row.essen_id,
+          meal_name: row.meal_name,
+          price: parseFloat(row.price)
+        };
+        plan.total_price += parseFloat(row.price);
+      }
+    });
 
-    res.json({ success: true, message: 'Essensplan erfolgreich gespeichert' });
+    res.json(plan);
   } catch (error) {
-    console.error('Fehler beim Speichern des Essensplans:', error);
-    res.status(500).json({ success: false, message: 'Serverfehler beim Speichern des Essensplans' });
+    console.error('Fehler beim Abrufen des Essensplans:', error);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Abrufen des Essensplans' });
   }
 });
 
-// Starte den Server
+
+
+
+
+
+// PUT-Route zum Aktualisieren eines vorhandenen Essensplans
+// PUT-Route zum Aktualisieren eines vorhandenen Essensplans
+app.put('/api/essensplan/:week', async (req, res) => {
+  const wochennummer = req.params.week; // Anpassung: Verwende wochennummer
+  const { plan } = req.body;
+
+  console.log('Aktualisiere Essensplan für Woche:', wochennummer);
+  console.log('Geplanter Plan:', plan);
+
+  try {
+    // Starte eine neue Transaktion
+    await pool.query('BEGIN');
+    
+    // Prüfe, ob ein vorhandener Plan für die Woche existiert
+    const checkExist = await pool.query('SELECT plan_id FROM essensplan WHERE wochennummer = $1', [wochennummer]);
+    let mealPlanId;
+
+    if (checkExist.rows.length > 0) {
+      mealPlanId = checkExist.rows[0].plan_id;
+      console.log('Vorhandener Plan gefunden, Lösche alte Einträge für plan_id:', mealPlanId);
+      
+      // Lösche die alten Einträge
+      await pool.query('DELETE FROM essen_im_plan WHERE plan_id = $1', [mealPlanId]);
+    } else {
+      console.log('Kein Plan gefunden, Erstelle neuen Plan');
+      
+      // Wenn kein Plan vorhanden ist, erstelle einen neuen
+      const newPlan = await pool.query('INSERT INTO essensplan (wochennummer) VALUES ($1) RETURNING plan_id', [wochennummer]);
+      mealPlanId = newPlan.rows[0].plan_id;
+    }
+
+    console.log('Füge neue Einträge hinzu für plan_id:', mealPlanId);
+
+    // Füge neue Einträge für die aktualisierte oder neue plan_id hinzu
+    for (const { tag, essen_id } of plan) { // Anpassung der Variablennamen
+      console.log('Füge hinzu zu essen_im_plan:', { mealPlanId, essen_id, tag });
+      await pool.query(
+        'INSERT INTO essen_im_plan (plan_id, essen_id, tag) VALUES ($1, $2, $3)',
+        [mealPlanId, essen_id, tag]
+      );
+    }
+
+    // Bestätige die Transaktion
+    await pool.query('COMMIT');
+    res.status(200).send('Essensplan erfolgreich aktualisiert');
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des Essensplans:', error);
+    // Bei Fehler: Transaktion zurückrollen
+    await pool.query('ROLLBACK');
+    res.status(500).send('Fehler beim Aktualisieren des Essensplans');
+  }
+});
+
+
+
+// DELETE-Route zum Löschen eines Essensplans
+app.delete('/api/essensplan/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log('Lösche Plan mit ID:', id);
+
+  if (!id || isNaN(parseInt(id, 10))) {
+    return res.status(400).json({ success: false, message: 'Ungültige Plan-ID' });
+  }
+
+  try {
+    const planId = parseInt(id, 10);
+
+    await pool.query('DELETE FROM essen_im_plan WHERE plan_id = $1', [planId]);
+    const deletePlanResult = await pool.query('DELETE FROM essensplan WHERE plan_id = $1 RETURNING *', [planId]);
+
+    if (deletePlanResult.rows.length > 0) {
+      res.json({ success: true, message: 'Essensplan erfolgreich gelöscht' });
+    } else {
+      res.status(404).json({ success: false, message: 'Essensplan nicht gefunden' });
+    }
+  } catch (error) {
+    console.error('Fehler beim Löschen des Essensplans:', error);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Löschen des Essensplans' });
+  }
+});
+
+
+
+
+
+
+// Server starten
 app.listen(3001, () => {
   console.log('Server läuft auf Port 3001');
 });

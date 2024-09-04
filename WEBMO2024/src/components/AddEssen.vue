@@ -27,6 +27,12 @@
 
       <button type="submit" class="btn btn-primary w-100">{{ $t('pages.add_food') }}</button>
     </form>
+
+    <!-- "Essen anzeigen" Button -->
+    <div class="text-center mt-4">
+      <button @click="showEssen" class="btn btn-secondary">Essen anzeigen</button>
+    </div>
+
     <p v-if="message" class="mt-3 text-success text-center">{{ message }}</p>
   </div>
 </template>
@@ -87,6 +93,9 @@ export default {
           this.message = this.$t('pages.server_error') + error.message; // Allgemeiner Fehler
         }
       }
+    },
+    showEssen() {
+      this.$router.push('/essen'); // Navigiert zur Seite '/essen'
     }
   }
 };
