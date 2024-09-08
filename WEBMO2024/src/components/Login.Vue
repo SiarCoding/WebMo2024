@@ -1,3 +1,4 @@
+<!-- Login.vue -->
 <template>
   <div class="container mt-5">
     <div class="row justify-content-center">
@@ -49,43 +50,42 @@ export default {
   },
   methods: {
     async login() {
-  if (!this.role) {
-    this.errorMessage = 'Bitte wählen Sie eine Rolle aus.';
-    return;
-  }
-
-  try {
-    const response = await axios.post('http://localhost:3001/login', {
-      username: this.username,
-      password: this.password,
-      role: this.role,
-    });
-
-    if (response.data.success) {
-      alert('Login erfolgreich!');
-
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token); // Token im Local Storage speichern
-      } else {
-        console.error('Token wurde nicht vom Server zurückgegeben.');
+      if (!this.role) {
+        this.errorMessage = 'Bitte wählen Sie eine Rolle aus.';
+        return;
       }
 
-      localStorage.setItem('role', response.data.role);
+      try {
+        const response = await axios.post('http://localhost:3001/login', {
+          username: this.username,
+          password: this.password,
+          role: this.role,
+        });
 
-      if (response.data.role === 'admin') {
-      this.$router.push('/essen'); 
-}      else {
-       this.$router.push('/essen'); // <-- Weiterleitung für normale Benutzer ebenfalls auf /essen
-}
-    } else {
-      this.errorMessage = response.data.message;
+        if (response.data.success) {
+          alert('Login erfolgreich!');
+
+          if (response.data.token) {
+            localStorage.setItem('token', response.data.token); // Token im Local Storage speichern
+          } else {
+            console.error('Token wurde nicht vom Server zurückgegeben.');
+          }
+
+          localStorage.setItem('role', response.data.role);
+
+          if (response.data.role === 'admin') {
+            this.$router.push('/essen'); 
+          } else {
+            this.$router.push('/essen'); // Weiterleitung für normale Benutzer ebenfalls auf /essen
+          }
+        } else {
+          this.errorMessage = response.data.message;
+        }
+      } catch (error) {
+        console.error('Login-Fehler:', error);
+        this.errorMessage = 'Ein Fehler ist aufgetreten';
+      }
     }
-  } catch (error) {
-    console.error('Login-Fehler:', error);
-    this.errorMessage = 'Ein Fehler ist aufgetreten';
-  }
-}
-
   },
 };
 </script>

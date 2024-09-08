@@ -3,24 +3,25 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
-const { verifyToken, verifyAdmin } = require('./middleware');
+const { verifyToken, verifyAdmin } = require('./middleware'); // Importiere die Middleware-Funktionen
 
+// Verbindung zur PostgreSQL-Datenbank herstellen
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'webmo2024',
-  password: '123',
+  user: 'postgres', 
+  host: 'localhost', 
+  database: 'webmo2024', 
+  password: '123', 
   port: 5432,
 });
 
 const app = express();
 
+// Middleware-Konfigurationen
 app.use(bodyParser.json());
-
 app.use(cors({
-  origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: 'http://localhost:5173', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  credentials: true 
 }));
 
 // POST-Route für Login
@@ -33,8 +34,8 @@ app.post('/login', async (req, res) => {
 
     if (user && user.password === password && user.role === role) {
       const token = jwt.sign(
-        { id: user.id, username: user.username, role: user.role },
-        'geheimnis',
+        { id: user.id, username: user.username, role: user.role }, 
+        'geheimnis', 
         { expiresIn: '1h' }
       );
 
@@ -94,14 +95,17 @@ app.post('/api/essen', verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// GET-Route zum Abrufen aller Essenspläne
+// GET-Route zum Abrufen aller Essenspläne mit Essen-Namen
 app.get('/api/essensplan', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT week_number, json_agg(json_build_object('day_of_week', day_of_week, 'meal_id', meal_id)) AS days
-      FROM essensplan
-      GROUP BY week_number
-      ORDER BY week_number;
+      SELECT 
+        ep.week_number, 
+        json_agg(json_build_object('day_of_week', ep.day_of_week, 'meal_name', e.name)) AS days
+      FROM essensplan ep
+      LEFT JOIN essen e ON ep.meal_id = e.id
+      GROUP BY ep.week_number
+      ORDER BY ep.week_number;
     `);
     res.json(result.rows);
   } catch (error) {
