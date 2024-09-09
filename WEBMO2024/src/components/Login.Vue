@@ -1,4 +1,3 @@
-<!-- Login.vue -->
 <template>
   <div class="container mt-5">
     <div class="row justify-content-center">
@@ -64,7 +63,6 @@ export default {
 
         if (response.data.success) {
           alert('Login erfolgreich!');
-
           if (response.data.token) {
             localStorage.setItem('token', response.data.token); // Token im Local Storage speichern
           } else {
@@ -74,7 +72,7 @@ export default {
           localStorage.setItem('role', response.data.role);
 
           if (response.data.role === 'admin') {
-            this.$router.push('/essen'); 
+            this.$router.push('/essen');
           } else {
             this.$router.push('/essen'); // Weiterleitung für normale Benutzer ebenfalls auf /essen
           }

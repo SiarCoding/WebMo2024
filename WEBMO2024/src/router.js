@@ -5,15 +5,17 @@ import Login from './components/Login.vue';
 import AddEssen from './components/AddEssen.vue';
 import EditEssen from './components/EditEssen.vue';
 import Plaene from './components/Plaene.vue';
+import EditEssensplan from './components/EditEssensplan.vue';
 
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
   { path: '/essen', component: Essen, meta: { requiresAuth: true } },
-  { path: '/essensplan', component: Essensplan, meta: { requiresAuth: true, requiresAdmin: true } }, // Nur für Admins
-  { path: '/add-essen', component: AddEssen, meta: { requiresAuth: true, requiresAdmin: true } }, // Nur für Admins
+  { path: '/essensplan', component: Essensplan, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/add-essen', component: AddEssen, meta: { requiresAuth: true, requiresAdmin: true } },
   { path: '/plaene', component: Plaene, meta: { requiresAuth: true } },
-  { path: '/essen/edit/:id', component: EditEssen, props: true, meta: { requiresAuth: true, requiresAdmin: true } }, // Nur für Admins
+  { path: '/essen/edit/:id', component: EditEssen, props: true, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/essensplan/edit/:week', name: 'EditEssensplan', component: EditEssensplan, props: true, meta: { requiresAuth: true, requiresAdmin: true } },
 ];
 
 const router = createRouter({
@@ -26,9 +28,9 @@ router.beforeEach((to, from, next) => {
   const role = localStorage.getItem('role');
 
   if (to.matched.some(record => record.meta.requiresAuth) && !token) {
-    next('/login'); // Umleitung auf Login-Seite, wenn keine Authentifizierung vorhanden ist
+    next('/login');
   } else if (to.matched.some(record => record.meta.requiresAdmin) && role !== 'admin') {
-    next('/login'); // Umleitung auf Login-Seite, wenn kein Admin-Zugriff vorhanden ist
+    next('/login');
   } else {
     next();
   }
