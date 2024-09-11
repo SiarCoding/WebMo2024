@@ -1,8 +1,16 @@
-<template>
+EditEssensplan: <template>
   <div class="container mt-5">
     <h2 class="text-center mb-4">Bearbeite Essensplan für Woche {{ selectedWeek }}</h2>
 
-    <!-- Day and meal selection -->
+    <!-- Dropdown zum Auswählen der Woche -->
+    <div class="mb-4 text-center">
+      <label for="week-select" class="form-label">Woche auswählen:</label>
+      <select id="week-select" v-model="selectedWeek" class="form-select w-25 mx-auto">
+        <option v-for="week in 8" :key="week" :value="week">Woche {{ week }}</option>
+      </select>
+    </div>
+
+    <!-- Auswahl der Mahlzeiten für die Tage -->
     <div class="row">
       <div
         class="col-md-6 mb-3"
@@ -21,10 +29,9 @@
       </div>
     </div>
 
-    <!-- Buttons for save plan and view plans -->
+    <!-- Buttons zum Speichern des Plans -->
     <div class="text-center">
       <button class="btn btn-primary me-2" @click="saveEditedPlan">Plan speichern</button>
-      <button class="btn btn-secondary" @click="viewPlans">Essenspläne ansehen</button>
       <p v-if="successMessage" class="text-success mt-3">{{ successMessage }}</p>
       <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
     </div>
@@ -37,8 +44,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      selectedWeek: this.$route.params.week, // Die ausgewählte Woche aus den Routenparametern
-      essenList: [], // Liste der verfügbaren Mahlzeiten
+      selectedWeek: 1, // Standardmäßig Woche 1 ausgewählt
+      essenList: [], 
       plan: {
         Montag: null,
         Dienstag: null,
@@ -57,47 +64,20 @@ export default {
         this.essenList = response.data;
       } catch (error) {
         this.errorMessage = 'Fehler beim Laden der Essen';
-      }
-    },
-
-    async loadPlan() {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/essensplan/${this.selectedWeek}`);
-        const currentPlan = response.data;
-
-        this.resetPlan(); // Plan zurücksetzen
-
-        if (currentPlan) {
-          for (const [day, meal] of Object.entries(currentPlan.days)) {
-            this.plan[day] = meal ? meal.essen_id : null; // Ändere 'meal_id' zu 'essen_id'
-          }
-        }
-
-        this.errorMessage = ''; // Fehlernachricht löschen
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          this.resetPlan(); 
-          this.errorMessage = ''; // Keine Fehlermeldung anzeigen
-        } else {
-          this.errorMessage = 'Fehler beim Laden des Essensplans.';
-        }
+        this.successMessage = ''; // Lösche die Erfolgsmeldung bei Fehler
       }
     },
 
     async saveEditedPlan() {
+      // Lösche beide Meldungen vor der Verarbeitung
+      this.successMessage = '';
+      this.errorMessage = '';
+
       try {
         const plan = Object.keys(this.plan).map(day => ({
-          tag: day, // Ändere 'day_of_week' zu 'tag'
-          essen_id: this.plan[day] // Ändere 'meal_id' zu 'essen_id'
+          tag: day,
+          essen_id: this.plan[day]
         }));
-
-        const mealIds = plan.map(item => item.essen_id);
-        const uniqueMeals = new Set(mealIds);
-
-        if (uniqueMeals.size !== mealIds.length) {
-          this.errorMessage = 'Ein Essensplan darf nicht dasselbe Gericht mehr als einmal pro Woche anbieten.';
-          return;
-        }
 
         const token = localStorage.getItem('token');
         if (!token) {
@@ -106,9 +86,7 @@ export default {
           return;
         }
 
-        // PUT-Anfrage zum Speichern des bearbeiteten Essensplans
         const response = await axios.put(`http://localhost:3001/api/essensplan/${this.selectedWeek}`, {
-          wochennummer: this.selectedWeek, // Ändere 'week_number' zu 'wochennummer'
           plan
         }, {
           headers: {
@@ -117,33 +95,18 @@ export default {
         });
 
         this.successMessage = response.data.message;
-        this.errorMessage = ''; // Lösche die Fehlermeldung, falls vorhanden
+        this.errorMessage = ''; // Lösche die Fehlermeldung, wenn die Speicherung erfolgreich war.
 
-        // Lade den Plan erneut nach erfolgreichem Speichern
         await this.loadPlan();
       } catch (error) {
+        this.successMessage = ''; // Lösche die Erfolgsmeldung, wenn ein Fehler auftritt.
         this.errorMessage = error.response?.data?.message || 'Fehler beim Speichern des Essensplans';
       }
-    },
-    
-    viewPlans() {
-      this.$router.push('/plaene');
-    },
-
-    resetPlan() {
-      this.plan = {
-        Montag: null,
-        Dienstag: null,
-        Mittwoch: null,
-        Donnerstag: null,
-        Freitag: null,
-      };
     }
   },
 
   mounted() {
     this.loadEssen();
-    this.loadPlan();
   }
 }
 </script>

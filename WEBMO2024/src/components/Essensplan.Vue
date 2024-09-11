@@ -1,43 +1,39 @@
 <template>
   <div class="container mt-5">
-    <h2 class="title mb-4 text-center">Essenspläne für 8 Wochen</h2>
+    <h2 class="text-center mb-4">Bearbeite Essensplan für Woche {{ selectedWeek }}</h2>
 
-    <!-- Erfolg- und Fehlermeldungen -->
-    <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-    <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
-
-    <!-- Dropdown zum Auswählen des Essensplans -->
-    <div class="text-center mb-3">
+    <!-- Dropdown zum Auswählen der Woche -->
+    <div class="mb-4 text-center">
       <label for="week-select" class="form-label">Woche auswählen:</label>
-      <select id="week-select" v-model="selectedWeek" class="form-select w-25 mx-auto" @change="loadPlan">
+      <select id="week-select" v-model="selectedWeek" class="form-select w-25 mx-auto">
         <option v-for="week in 8" :key="week" :value="week">Woche {{ week }}</option>
       </select>
-      <button class="btn btn-success" @click="addPlan">Essensplan hinzufügen</button>
     </div>
 
-    <!-- Liste der Essenspläne -->
+    <!-- Auswahl der Mahlzeiten für die Tage -->
     <div class="row">
-      <div v-for="plan in essensplaene" :key="plan.plan_id" class="col-md-6 mb-4">
+      <div
+        class="col-md-6 mb-3"
+        v-for="(mealId, day) in plan"
+        :key="day"
+      >
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Essensplan für Woche {{ plan.wochennummer }}</h5>
-            <ul class="list-group list-group-flush mb-3">
-              <li v-for="(meal, day) in plan.days" :key="day" class="list-group-item">
-                <strong>{{ day }}:</strong>
-                <span v-if="meal">{{ meal.meal_name }} - {{ meal.price.toFixed(2) }} €</span>
-                <span v-else>Kein Essen ausgewählt</span>
-              </li>
-            </ul>
-            <div class="d-flex justify-content-between mb-2">
-              <strong>Gesamtpreis:</strong> {{ plan.total_price.toFixed(2) }} €
-            </div>
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-primary me-2" @click="editPlan(plan)">Bearbeiten</button>
-              <button class="btn btn-danger" @click="deletePlan(plan.plan_id)">Löschen</button>
-            </div>
+            <h5 class="card-title">{{ day }}</h5>
+            <select v-model="plan[day]" class="form-select">
+              <option value="" disabled>Wählen Sie ein Essen</option>
+              <option v-for="essen in essenList" :key="essen.id" :value="essen.id">{{ essen.name }}</option>
+            </select>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Buttons zum Speichern des Plans -->
+    <div class="text-center">
+      <button class="btn btn-primary me-2" @click="saveEditedPlan">Plan speichern</button>
+      <p v-if="successMessage" class="text-success mt-3">{{ successMessage }}</p>
+      <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
     </div>
   </div>
 </template>
@@ -48,59 +44,87 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      essensplaene: [],
       selectedWeek: 1, // Standardmäßig Woche 1 ausgewählt
-      selectedPlan: null, // Aktuell ausgewählter Plan
+      essenList: [], 
+      plan: {
+        Montag: null,
+        Dienstag: null,
+        Mittwoch: null,
+        Donnerstag: null,
+        Freitag: null,
+      },
       errorMessage: '',
       successMessage: '',
     };
   },
   methods: {
-    async loadPlans() {
+    async loadEssen() {
       try {
-        const response = await axios.get('http://localhost:3001/api/essensplan');
-        this.essensplaene = response.data;
-        this.loadPlan(); // Lädt den Plan für die standardmäßig ausgewählte Woche
+        const response = await axios.get('http://localhost:3001/api/essen');
+        this.essenList = response.data;
       } catch (error) {
-        console.error('Fehler beim Laden der Essenspläne:', error);
-        this.errorMessage = 'Fehler beim Laden der Essenspläne';
+        this.errorMessage = 'Fehler beim Laden der Essen';
       }
     },
-    loadPlan() {
-      this.selectedPlan = this.essensplaene.find(plan => plan.week_number == this.selectedWeek);
-      if (!this.selectedPlan) {
-        this.errorMessage = `Kein Plan für Woche ${this.selectedWeek} gefunden.`;
-      } else {
-        this.errorMessage = '';
-      }
-    },
-    async deletePlan(planId) {
+
+    async loadPlan() {
       try {
-        if (!planId) {
-          this.errorMessage = 'Ungültige Plan-ID. Bitte versuchen Sie es erneut.';
+        // Logik zum Laden des Plans für die ausgewählte Woche
+        const response = await axios.get(`http://localhost:3001/api/essensplan/${this.selectedWeek}`);
+        const plan = response.data;
+        this.plan = plan.reduce((acc, item) => {
+          acc[item.tag] = item.essen_id;
+          return acc;
+        }, {});
+      } catch (error) {
+        this.errorMessage = 'Fehler beim Laden des Essensplans';
+      }
+    },
+
+    async saveEditedPlan() {
+      // Zurücksetzen der Meldungen vor dem Speichern
+      this.successMessage = '';
+      this.errorMessage = '';
+
+      try {
+        const plan = Object.keys(this.plan).map(day => ({
+          tag: day,
+          essen_id: this.plan[day]
+        }));
+
+        console.log("Gesendete Daten:", plan); 
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+          this.errorMessage = 'Token fehlt. Bitte erneut einloggen.';
+          this.$router.push('/login');
           return;
         }
-        await axios.delete(`http://localhost:3001/api/essensplan/${planId}`);
-        this.successMessage = 'Essensplan erfolgreich gelöscht';
-        this.errorMessage = '';
-        this.loadPlans();
+
+        const response = await axios.put(`http://localhost:3001/api/essensplan/${this.selectedWeek}`, {
+          plan
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+
+        this.successMessage = response.data.message;
+
+        // Plan erneut laden
+        await this.loadPlan();
       } catch (error) {
-        console.error('Fehler beim Löschen des Essensplans:', error);
-        this.successMessage = '';
-        this.errorMessage = 'Fehler beim Löschen des Essensplans';
+        console.error("Fehler:", error); 
+        this.errorMessage = error.response?.data?.message || 'Fehler beim Speichern des Essensplans';
       }
-    },
-    addPlan() {
-      this.$router.push('/essensplan');
-    },
-    editPlan(plan) {
-      this.$router.push({ name: 'EditEssensplan', params: { week: plan.wochennummer } });
     }
   },
-  created() {
-    this.loadPlans();
+
+  mounted() {
+    this.loadEssen();
+    this.loadPlan(); // Lade den Plan beim Mounten der Komponente
   }
-};
+}
 </script>
 
 <style scoped>
@@ -108,24 +132,16 @@ export default {
   max-width: 800px;
 }
 
-.card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 .card-title {
-  font-size: 1.25rem;
   margin-bottom: 15px;
 }
 
-.list-group-item {
-  padding: 0.75rem 1.25rem;
+.text-danger,
+.text-success {
+  font-weight: bold;
 }
 
-.btn {
-  min-width: 100px;
-}
-
-.alert {
-  margin-top: 20px;
+.me-2 {
+  margin-right: 0.5rem;
 }
 </style>

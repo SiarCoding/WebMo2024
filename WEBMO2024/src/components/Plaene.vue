@@ -15,15 +15,15 @@
     </div>
 
     <!-- Gewählter Essensplan anzeigen -->
-    <div class="row justify-content-center" v-if="selectedPlan">
+    <div v-if="selectedPlan" class="row justify-content-center">
       <div class="col-md-6 mb-4">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Essensplan für Woche {{ selectedWeek }}</h5>
             <ul class="list-group list-group-flush mb-3">
-              <li v-for="day in selectedPlan.days" :key="day.day_of_week" class="list-group-item">
-                <strong>{{ day.day_of_week }}:</strong>
-                <span v-if="day.meal_name">{{ day.meal_name }}</span>
+              <li v-for="(meal, day) in selectedPlan.days" :key="day" class="list-group-item">
+                <strong>{{ day }}:</strong>
+                <span v-if="meal">{{ meal.meal_name }} - {{ meal.price.toFixed(2) }} €</span>
                 <span v-else>Kein Essen ausgewählt</span>
               </li>
             </ul>
@@ -37,36 +37,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Liste der Essenspläne -->
-    <div class="row">
-      <div v-for="plan in essensplaene" :key="plan.plan_id" class="col-md-6 mb-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Essensplan für Woche {{ plan.wochennummer }}</h5>
-            <ul class="list-group list-group-flush mb-3">
-              <li v-for="(meal, day) in plan.days" :key="day" class="list-group-item">
-                <strong>{{ day }}:</strong>
-                <span v-if="meal">{{ meal.meal_name }} - {{ meal.price.toFixed(2) }} €</span>
-                <span v-else>Kein Essen ausgewählt</span>
-              </li>
-            </ul>
-            <div class="d-flex justify-content-between mb-2">
-              <strong>Gesamtpreis:</strong> {{ plan.total_price.toFixed(2) }} €
-            </div>
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-primary me-2" @click="editPlan(plan)">Bearbeiten</button>
-              <button class="btn btn-danger" @click="deletePlan(plan.plan_id)">Löschen</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Plan hinzufügen Button -->
-    <div class="text-center mb-3">
-      <button class="btn btn-success" @click="addPlan">Essensplan hinzufügen</button>
     </div>
   </div>
 </template>
@@ -90,16 +60,17 @@ export default {
         const response = await axios.get('http://localhost:3001/api/essensplan');
         this.essensplaene = response.data;
         this.loadPlan(); // Lädt den Plan für die standardmäßig ausgewählte Woche
-        console.log('Geladene Pläne:', this.essensplaene);
       } catch (error) {
         console.error('Fehler beim Laden der Essenspläne:', error);
         this.errorMessage = 'Fehler beim Laden der Essenspläne';
       }
     },
     loadPlan() {
+      // Lade den Plan für die ausgewählte Woche
       this.selectedPlan = this.essensplaene.find(plan => plan.wochennummer == this.selectedWeek);
       if (!this.selectedPlan) {
         this.errorMessage = `Kein Plan für Woche ${this.selectedWeek} gefunden.`;
+        this.successMessage = '';
       } else {
         this.errorMessage = '';
       }
@@ -113,7 +84,7 @@ export default {
         await axios.delete(`http://localhost:3001/api/essensplan/${planId}`);
         this.successMessage = 'Essensplan erfolgreich gelöscht';
         this.errorMessage = '';
-        this.loadPlans();
+        this.loadPlans(); // Aktualisiere die Pläne nach dem Löschen
       } catch (error) {
         console.error('Fehler beim Löschen des Essensplans:', error);
         this.successMessage = '';
@@ -121,7 +92,7 @@ export default {
       }
     },
     addPlan() {
-      this.$router.push('/essensplan'); // Navigation zur Seite zum Hinzufügen eines neuen Plans
+      this.$router.push('/essensplan');
     },
     editPlan(plan) {
       this.$router.push({ name: 'EditEssensplan', params: { week: plan.wochennummer } });
