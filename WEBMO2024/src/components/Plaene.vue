@@ -8,7 +8,6 @@
 
     <!-- Dropdown zum Auswählen des Essensplans -->
     <div class="text-center mb-3">
-<<<<<<< HEAD
       <label for="week-select" class="form-label">Woche auswählen:</label>
       <select id="week-select" v-model="selectedWeek" class="form-select w-25 mx-auto" @change="loadPlan">
         <option v-for="week in 8" :key="week" :value="week">Woche {{ week }}</option>
@@ -16,8 +15,8 @@
     </div>
 
     <!-- Gewählter Essensplan anzeigen -->
-    <div class="row justify-content-center">
-      <div class="col-md-6 mb-4" v-if="selectedPlan">
+    <div class="row justify-content-center" v-if="selectedPlan">
+      <div class="col-md-6 mb-4">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Essensplan für Woche {{ selectedWeek }}</h5>
@@ -25,8 +24,19 @@
               <li v-for="day in selectedPlan.days" :key="day.day_of_week" class="list-group-item">
                 <strong>{{ day.day_of_week }}:</strong>
                 <span v-if="day.meal_name">{{ day.meal_name }}</span>
-=======
-      <button class="btn btn-success" @click="addPlan">Essensplan hinzufügen</button>
+                <span v-else>Kein Essen ausgewählt</span>
+              </li>
+            </ul>
+            <div class="d-flex justify-content-between mb-2">
+              <strong>Gesamtpreis:</strong> {{ selectedPlan.total_price.toFixed(2) }} €
+            </div>
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-primary me-2" @click="editPlan(selectedPlan)">Bearbeiten</button>
+              <button class="btn btn-danger" @click="deletePlan(selectedPlan.plan_id)">Löschen</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Liste der Essenspläne -->
@@ -34,13 +44,11 @@
       <div v-for="plan in essensplaene" :key="plan.plan_id" class="col-md-6 mb-4">
         <div class="card">
           <div class="card-body">
-            <!-- Stelle sicher, dass die richtige Variable verwendet wird -->
-            <h5 class="card-title">Essensplan für Woche {{ plan.wochennummer }}</h5> <!-- Ändere 'plan.week_number' zu 'plan.wochennummer' -->
+            <h5 class="card-title">Essensplan für Woche {{ plan.wochennummer }}</h5>
             <ul class="list-group list-group-flush mb-3">
               <li v-for="(meal, day) in plan.days" :key="day" class="list-group-item">
                 <strong>{{ day }}:</strong>
                 <span v-if="meal">{{ meal.meal_name }} - {{ meal.price.toFixed(2) }} €</span>
->>>>>>> 24e8f825c08fc1bcc46bff2cb2bacc8b0b37b318
                 <span v-else>Kein Essen ausgewählt</span>
               </li>
             </ul>
@@ -54,6 +62,11 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Plan hinzufügen Button -->
+    <div class="text-center mb-3">
+      <button class="btn btn-success" @click="addPlan">Essensplan hinzufügen</button>
     </div>
   </div>
 </template>
@@ -76,24 +89,21 @@ export default {
       try {
         const response = await axios.get('http://localhost:3001/api/essensplan');
         this.essensplaene = response.data;
-<<<<<<< HEAD
         this.loadPlan(); // Lädt den Plan für die standardmäßig ausgewählte Woche
-=======
         console.log('Geladene Pläne:', this.essensplaene);
->>>>>>> 24e8f825c08fc1bcc46bff2cb2bacc8b0b37b318
       } catch (error) {
         console.error('Fehler beim Laden der Essenspläne:', error);
         this.errorMessage = 'Fehler beim Laden der Essenspläne';
       }
     },
-<<<<<<< HEAD
     loadPlan() {
-      this.selectedPlan = this.essensplaene.find(plan => plan.week_number == this.selectedWeek);
+      this.selectedPlan = this.essensplaene.find(plan => plan.wochennummer == this.selectedWeek);
       if (!this.selectedPlan) {
         this.errorMessage = `Kein Plan für Woche ${this.selectedWeek} gefunden.`;
       } else {
         this.errorMessage = '';
-=======
+      }
+    },
     async deletePlan(planId) {
       try {
         if (!planId) {
@@ -108,17 +118,13 @@ export default {
         console.error('Fehler beim Löschen des Essensplans:', error);
         this.successMessage = '';
         this.errorMessage = 'Fehler beim Löschen des Essensplans';
->>>>>>> 24e8f825c08fc1bcc46bff2cb2bacc8b0b37b318
       }
     },
     addPlan() {
       this.$router.push('/essensplan'); // Navigation zur Seite zum Hinzufügen eines neuen Plans
-<<<<<<< HEAD
-=======
     },
     editPlan(plan) {
-      this.$router.push({ name: 'EditEssensplan', params: { week: plan.wochennummer } }); // Ändere 'plan.week_number' zu 'plan.wochennummer'
->>>>>>> 24e8f825c08fc1bcc46bff2cb2bacc8b0b37b318
+      this.$router.push({ name: 'EditEssensplan', params: { week: plan.wochennummer } });
     }
   },
   created() {
