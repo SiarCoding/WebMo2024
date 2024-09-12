@@ -1,21 +1,14 @@
-<!-- src/components/Essen.vue -->
 <template>
   <div class="container mt-5">
-    <h2 class="title mb-4 text-center">{{ $t('pages.essen_list') }}</h2>
-    
-    <div class="d-flex justify-content-between mb-3">
-      <button @click="goToEssensplanPage" class="btn btn-primary">{{ $t('pages.create_meal_plan') }}</button>
-      <button v-if="isAdmin" @click="goToAddPage" class="btn btn-success">{{ $t('pages.add_food') }}</button>
-    </div>
+    <h2 class="mb-4 text-center display-5">{{ $t('pages.essen_list') }}</h2>
 
     <div class="row">
       <div class="col-md-4 mb-4" v-for="item in essenList" :key="item.id">
-        <div class="card h-100">
+        <div class="card h-100 shadow-sm bg-light">
           <div class="card-body">
             <h5 class="card-title">{{ item.name }}</h5>
             <h6 class="card-subtitle mb-2 text-muted">{{ $t('pages.food_price') }}: {{ item.price }}€</h6>
             <p class="card-text">{{ item.beschreibung }}</p>
-            <!-- Dynamische Übersetzung des Typs -->
             <p class="badge bg-info">{{ $t('pages.' + translateType(item.type)) }}</p>
           </div>
           <div class="card-footer d-flex justify-content-between" v-if="isAdmin">
@@ -41,15 +34,10 @@ export default {
   methods: {
     async loadEssen() {
       try {
-        console.log('Lade Daten von Backend...');
         const response = await axios.get('http://localhost:3001/api/essen');
-        console.log('Daten von Backend erhalten:', response.data);
         this.essenList = response.data;
       } catch (error) {
         console.error('Fehler beim Laden der Essen:', error);
-        if (error.response) {
-          console.error('Fehlerdaten:', error.response.data);
-        }
       }
     },
     async deleteEssen(id) {
@@ -60,7 +48,7 @@ export default {
           this.$router.push('/login');
           return;
         }
-        
+
         const response = await axios.delete(`http://localhost:3001/api/essen/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -68,32 +56,23 @@ export default {
         });
 
         if (response.data.success) {
-          this.message = 'Essen erfolgreich gelöscht!';
           this.loadEssen();
         } else {
-          this.message = response.data.message;
+          alert(response.data.message);
         }
-
       } catch (error) {
         console.error('Fehler beim Löschen des Essens:', error);
-        this.message = 'Fehler beim Löschen des Essens';
+        alert('Fehler beim Löschen des Essens.');
       }
     },
+
     goToEditPage(item) {
       if (this.isAdmin) {
         this.$router.push(`/essen/edit/${item.id}`);
       }
     },
-    goToAddPage() {
-      this.$router.push('/add-essen');
-    },
-
-    goToEssensplanPage() {
-      this.$router.push('/essensplan');
-    },
-    // Hilfsfunktion zur Übersetzung des Typs
     translateType(type) {
-      switch(type) {
+      switch (type) {
         case 'mit Fleisch':
           return 'meat';
         case 'vegetarisch':
@@ -101,7 +80,7 @@ export default {
         case 'vegan':
           return 'vegan';
         default:
-          return type; // Fallback, falls keine Übereinstimmung gefunden wird
+          return type;
       }
     }
   },
@@ -112,45 +91,52 @@ export default {
 </script>
 
 <style scoped>
+/* Importiere Google-Schriftart Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 .container {
   max-width: 1200px;
 }
 
+.title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 .card {
+  background-color: #cf93d7;
   transition: transform 0.2s ease-in-out;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 .card:hover {
   transform: scale(1.05);
 }
 
-.card-title {
+h5.card-title {
+  font-family: 'Poppins', sans-serif;
   font-size: 1.25rem;
-  font-weight: bold;
+  font-weight: 600;
+  color: #343a40;
 }
 
-.card-subtitle {
+h6.card-subtitle {
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
+  font-weight: 400;
+  color: #6c757d;
 }
 
-.badge {
-  font-size: 0.85rem;
-}
-
-.btn {
-  font-size: 0.85rem;
-  margin-right: 5px;
-}
-
-h2.title {
-  font-size: 2rem;
-  color: #333;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.alert {
-  margin-top: 10px;
+p.card-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  color: #495057;
 }
 </style>

@@ -36,88 +36,70 @@ import axios from 'axios';
 
 export default {
   data() {
-      return {
-          essen: {
-              name: '',
-              preis: 0,
-              art: ''
-          },
-          message: ''
-      };
+    return {
+      essen: {
+        name: '',
+        preis: 0,
+        art: ''
+      },
+      message: ''
+    };
   },
 
-   
-async created() {
-   // Überprüfen, ob der Benutzer authentifiziert ist
-   if (!this.isAuthenticated()) {
-       this.$router.push('/login');
-       return;
-   }
-
-   const id = this.$route.params.id;
-   try {
-    const response = await axios.get(`http://localhost:3001/api/essen/${id}`); // Korrekte Verwendung von Backticks
-    // <-- Hier wurde auch die URL korrigiert
-       this.essen = response.data;
-   } catch (error) {
-       console.error('Fehler beim Laden des Essens:', error);
-       this.message = 'Fehler beim Laden der Daten.';
-   }
-}, // <-- Das Komma hinzugefügt
-
-  
-  
-  methods: {
-      isAuthenticated() {
-          // Überprüfe hier die Authentifizierung (z.B. Token im Local Storage)
-          const token = localStorage.getItem('token');
-          console.log('Authentifizierungstoken:', token); // Beispiel für Token im Local Storage
-          return !!token; // Gibt true zurück, wenn der Token vorhanden ist
-      },
-      
-      
-      async updateEssen() {
+  async created() {
+  const id = this.$route.params.id;
   try {
-    // Token aus dem localStorage abrufen
-    const token = localStorage.getItem('token');
-
-    // Überprüfen, ob das Token vorhanden ist
-    if (!token) {
-      this.$router.push('/login');
-      return;
-    }
-
-    // Anfrage an den Server senden
-    const response = await axios.put(`http://localhost:3001/api/essen/${this.essen.id}`, this.essen, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Token in der Anfrage hinzufügen
-      },
-    });
-
-    if (response.data.success) {
-      this.message = 'Essen erfolgreich aktualisiert!';
-      this.$router.push('/essen'); // Zurück zur Liste nach erfolgreichem Speichern
-    } else {
-      this.message = 'Fehler beim Aktualisieren des Essens';
-    }
+    const response = await axios.get(`http://localhost:3001/api/essen/${id}`);
+    
+    // Stelle sicher, dass alle Daten korrekt geladen werden
+    this.essen = {
+      name: response.data.name,
+      preis: response.data.price, // Preis
+      art: response.data.type     // Art (vegetarisch, vegan, etc.)
+    };
   } catch (error) {
-    console.error('Fehler beim Aktualisieren des Essens:', error);
-    this.message = 'Serverfehler: ' + error.message;
-
-    // Falls ein Fehler auftritt, prüfen, ob der Benutzer authentifiziert ist
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token'); // Token löschen
-      localStorage.removeItem('role'); // Rolle löschen
-      this.$router.push('/login'); // Weiterleitung zur Login-Seite
-    }
+    console.error('Fehler beim Laden des Essens:', error);
+    this.message = 'Fehler beim Laden der Daten.';
   }
-}
+},
 
 
+  methods: {
+    isAuthenticated() {
+      const token = localStorage.getItem('token');
+      return !!token; // Gibt true zurück, wenn der Token vorhanden ist
+    },
 
+    async updateEssen() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          this.$router.push('/login');
+          return;
+        }
 
+        const response = await axios.put(`http://localhost:3001/api/essen/${this.$route.params.id}`, this.essen, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
+        if (response.data.success) {
+          this.message = 'Essen erfolgreich aktualisiert!';
+          this.$router.push('/essen'); // Zurück zur Liste nach erfolgreichem Speichern
+        } else {
+          this.message = 'Fehler beim Aktualisieren des Essens';
+        }
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren des Essens:', error);
+        this.message = 'Serverfehler: ' + error.message;
+
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem('token'); // Token löschen
+          this.$router.push('/login'); // Weiterleitung zur Login-Seite
+        }
+      }
+    }
   }
 };
-
 </script>

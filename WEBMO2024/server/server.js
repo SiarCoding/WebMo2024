@@ -65,6 +65,25 @@ app.get('/api/essen', async (req, res) => {
   }
 });
 
+// GET-Route zum Abrufen eines einzelnen Essens
+app.get('/api/essen/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT name, price, type FROM food WHERE id = $1', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+    }
+
+    // Sende die vollständigen Daten zurück
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Fehler beim Abrufen des Essens:', error);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Abrufen des Essens' });
+  }
+});
+
+
 // POST-Route zum Hinzufügen von Essen (nur für Admins)
 app.post('/api/essen', verifyToken, verifyAdmin, async (req, res) => {
   const { name, preis, art } = req.body;
@@ -95,6 +114,47 @@ app.post('/api/essen', verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
+// PUT-Route zum Bearbeiten eines Essens (nur für Admins)
+app.put('/api/essen/:id', verifyToken, verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { name, preis, art } = req.body;
+
+  try {
+    // Überprüfen, ob das Essen mit der angegebenen ID existiert
+    const result = await pool.query('UPDATE food SET name = $1, price = $2, type = $3 WHERE id = $4 RETURNING *', 
+      [name, preis, art, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+    }
+
+    res.json({ success: true, message: 'Essen erfolgreich aktualisiert', essen: result.rows[0] });
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des Essens:', error);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Aktualisieren des Essens' });
+  }
+});
+
+
+// DELETE-Route zum Löschen eines Essens (nur für Admins)
+app.delete('/api/essen/:id', verifyToken, verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('DELETE FROM food WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Essen nicht gefunden' });
+    }
+
+    res.json({ success: true, message: 'Essen erfolgreich gelöscht' });
+  } catch (error) {
+    console.error('Fehler beim Löschen des Essens:', error);
+    res.status(500).json({ success: false, message: 'Serverfehler beim Löschen des Essens' });
+  }
+});
+
+
 // POST-Route zum Erstellen eines neuen Essensplans
 app.post('/api/essensplan', async (req, res) => {
   const { wochennummer, plan } = req.body;
@@ -111,6 +171,14 @@ app.post('/api/essensplan', async (req, res) => {
 
     if (checkExist.rows.length > 0) {
       return res.status(400).json({ success: false, message: `Ein Essensplan für Woche ${wochennummer} existiert bereits.` });
+    }
+
+    // Überprüfung auf doppelte Essen-IDs im Plan
+    const essenIds = plan.map(item => item.essen_id);
+    const duplicateEssenIds = essenIds.filter((item, index) => essenIds.indexOf(item) !== index);
+
+    if (duplicateEssenIds.length > 0) {
+      return res.status(400).json({ success: false, message: 'Doppelte Essen im Plan sind nicht erlaubt.' });
     }
 
     await pool.query('BEGIN');
@@ -151,6 +219,9 @@ app.post('/api/essensplan', async (req, res) => {
     res.status(500).json({ success: false, message: 'Serverfehler beim Speichern des Essensplans', error: error.message });
   }
 });
+
+
+
 
 // GET-Route zum Abrufen aller Essenspläne
 app.get('/api/essensplan', async (req, res) => {
@@ -216,10 +287,23 @@ app.get('/api/essensplan/:week', async (req, res) => {
       ORDER BY l.day_of_week;
     `, [wochennummer]);
 
+    // Überprüfen, ob ein Plan für die Woche gefunden wurde
     if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: `Kein Essensplan für die ausgewählte Woche ${wochennummer} gefunden.` });
+      // Gib einen leeren Plan zurück, wenn kein Eintrag für diese Woche gefunden wurde
+      return res.json({
+        wochennummer,
+        days: {
+          Montag: null,
+          Dienstag: null,
+          Mittwoch: null,
+          Donnerstag: null,
+          Freitag: null
+        },
+        total_price: 0
+      });
     }
 
+    // Plan zusammenstellen
     const plan = {
       wochennummer: wochennummer,
       days: {
@@ -249,6 +333,8 @@ app.get('/api/essensplan/:week', async (req, res) => {
     res.status(500).json({ success: false, message: 'Serverfehler beim Abrufen des Essensplans' });
   }
 });
+
+
 
 // PUT-Route zum Aktualisieren eines Essensplans
 app.put('/api/essensplan/:week', async (req, res) => {

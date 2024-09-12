@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 function verifyToken(req, res, next) {
+  console.log('Authorization Header:', req.headers['authorization']); // Überprüfen, ob der Header korrekt ankommt
   const token = req.headers['authorization'];
   if (!token) {
     return res.status(403).json({ success: false, message: 'Kein Token vorhanden' });
@@ -14,6 +15,8 @@ function verifyToken(req, res, next) {
     next();
   });
 }
+
+
 
 function verifyAdmin(req, res, next) {
   if (req.user.role !== 'admin') {

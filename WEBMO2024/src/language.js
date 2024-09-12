@@ -1,13 +1,13 @@
-// src/language.js
 import { createI18n } from 'vue-i18n';
 
-// Definieren Sie die Übersetzungen für die unterstützten Sprachen
 const messages = {
   en: {
     pages: {
+      app_name: 'Food Management',
       essen_list: 'Food List',
       add_food: 'Add New Food',
       create_meal_plan: 'Create Meal Plan',
+      view_meal_plans: 'Meal Plans',
       food_price: 'Price',
       food_description: 'Description',
       food_name: 'Name',
@@ -22,13 +22,34 @@ const messages = {
       no_token: 'No token found. Please log in again.',
       food_added: 'Food successfully added!',
       server_error: 'Server error: ',
+      loggedInAs: 'Logged in as',
+      logout: 'Logout',
+      view_food: 'View Food-List',
+      select_week: 'Select week:',
+      choose_food: 'Choose a meal',
+      duplicate_error: 'Cannot select the same meal twice!',
+      save_plan: 'Save Plan',
+      week: 'Week',
+      days: {
+        Montag: 'Monday',
+        Dienstag: 'Tuesday',
+        Mittwoch: 'Wednesday',
+        Donnerstag: 'Thursday',
+        Freitag: 'Friday',
+      },
+      total_price: 'Total Price',
+      no_plan_for_week: 'No plan for week',
+      invalid_plan_id: 'Invalid plan ID',
+      plan_deleted: 'Meal plan successfully deleted',
     },
   },
   de: {
     pages: {
-      essen_list: 'Essen Liste',
+      app_name: 'Essensverwaltung',
+      essen_list: 'Essensliste',
       add_food: 'Neues Essen hinzufügen',
       create_meal_plan: 'Essensplan erstellen',
+      view_meal_plans: 'Essenspläne',
       food_price: 'Preis',
       food_description: 'Beschreibung',
       food_name: 'Name',
@@ -43,14 +64,33 @@ const messages = {
       no_token: 'Kein Token vorhanden. Bitte erneut anmelden.',
       food_added: 'Essen erfolgreich hinzugefügt!',
       server_error: 'Serverfehler: ',
+      loggedInAs: 'Angemeldet als',
+      logout: 'Abmelden',
+      view_food: 'Essensliste anzeigen',
+      select_week: 'Woche auswählen:',
+      choose_food: 'Wählen Sie ein Essen',
+      duplicate_error: 'Zwei mal das gleiche Essen ist nicht möglich!',
+      save_plan: 'Plan speichern',
+      week: 'Woche',
+      days: {
+        Montag: 'Montag',
+        Dienstag: 'Dienstag',
+        Mittwoch: 'Mittwoch',
+        Donnerstag: 'Donnerstag',
+        Freitag: 'Freitag',
+      },
+      total_price: 'Gesamtpreis',
+      no_plan_for_week: 'Kein Plan für Woche',
+      invalid_plan_id: 'Ungültige Plan-ID',
+      plan_deleted: 'Essensplan erfolgreich gelöscht',
     },
   },
 };
 
-// Erstellen Sie eine Instanz von i18n
 const i18n = createI18n({
-  locale: 'en', // Standard-Sprache
-  messages, // Nachrichten-Objekt
+  locale: 'de',
+  fallbackLocale: 'en',
+  messages,
 });
 
-export default i18n; // Standard-Export der i18n-Instanz
+export default i18n;

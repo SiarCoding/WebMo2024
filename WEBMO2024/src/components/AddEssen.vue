@@ -1,23 +1,43 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center">🍽️ {{ $t('pages.add_food') }}</h2>
-    <form @submit.prevent="hinzufuegen" class="card p-4 shadow-sm" style="background-color: #e3f2fd;">
+    <h2 class="mb-4 text-center display-5">🍽️ {{ $t('pages.add_food') }}</h2>
+    
+    <form @submit.prevent="hinzufuegen" class="card p-4 shadow-lg" style="background-color: #f5fafd; border-radius: 10px;">
       <div class="mb-3">
-        <label for="name" class="form-label">{{ $t('pages.food_name') }}:</label>
-        <input type="text" v-model="essen.name" class="form-control" id="name" required />
+        <label for="name" class="form-label fw-bold">{{ $t('pages.food_name') }}:</label>
+        <input 
+          type="text" 
+          v-model="essen.name" 
+          class="form-control form-control-lg shadow-sm" 
+          id="name" 
+          required
+        />
       </div>
 
       <div class="mb-3">
-        <label for="preis" class="form-label">{{ $t('pages.food_price') }}:</label>
-        <div class="input-group">
-          <input type="number" step="0.01" v-model="essen.preis" class="form-control" id="preis" required />
+        <label for="preis" class="form-label fw-bold">{{ $t('pages.food_price') }}:</label>
+        <div class="input-group input-group-lg shadow-sm">
+          <input 
+            type="number" 
+            step="0.01" 
+            v-model="essen.preis" 
+            class="form-control" 
+            id="preis" 
+            placeholder="10.99"
+            required
+          />
           <span class="input-group-text">€</span>
         </div>
       </div>
 
       <div class="mb-4">
-        <label for="art" class="form-label">{{ $t('pages.food_type') }}:</label>
-        <select v-model="essen.art" class="form-select" id="art" required>
+        <label for="art" class="form-label fw-bold">{{ $t('pages.food_type') }}:</label>
+        <select 
+          v-model="essen.art" 
+          class="form-select form-select-lg shadow-sm" 
+          id="art" 
+          required
+        >
           <option disabled value="">{{ $t('pages.please_select') }}</option>
           <option value="vegetarisch">{{ $t('pages.vegetarian') }}</option>
           <option value="vegan">{{ $t('pages.vegan') }}</option>
@@ -25,15 +45,15 @@
         </select>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100">{{ $t('pages.add_food') }}</button>
+      <button type="submit" class="btn btn-primary w-100 btn-lg shadow-sm">{{ $t('pages.add_food') }}</button>
     </form>
 
     <!-- "Essen anzeigen" Button -->
     <div class="text-center mt-4">
-      <button @click="showEssen" class="btn btn-secondary">Essen anzeigen</button>
+      <button @click="showEssen" class="btn btn-secondary btn-lg shadow-sm">{{ $t('pages.view_food') }}</button>
     </div>
 
-    <p v-if="message" class="mt-3 text-success text-center">{{ message }}</p>
+    <p v-if="message" class="mt-3 text-success text-center fw-bold">{{ message }}</p>
   </div>
 </template>
 
@@ -43,6 +63,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      currentLocale: this.$i18n.locale, // Aktuelle Sprache
       essen: {
         name: '',
         preis: 0,
@@ -52,6 +73,9 @@ export default {
     };
   },
   methods: {
+    changeLocale() {
+      this.$i18n.locale = this.currentLocale; // Sprache ändern
+    },
     async hinzufuegen() {
       console.log('Essen hinzufügen gestartet');
 
@@ -100,3 +124,37 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.container {
+  max-width: 700px;
+}
+
+.form-label {
+  font-size: 1.1rem;
+}
+
+input.form-control-lg,
+select.form-select-lg,
+.button.btn-lg {
+  font-size: 1.2rem;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.text-success {
+  font-weight: bold;
+}
+</style>

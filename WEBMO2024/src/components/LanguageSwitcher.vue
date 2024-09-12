@@ -25,4 +25,7 @@ export default {
 
 <style scoped>
 /* Optional: Zusätzliche Stile für den LanguageSwitcher */
+.form-select {
+  width: auto;
+}
 </style>
