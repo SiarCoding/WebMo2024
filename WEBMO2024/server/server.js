@@ -7,7 +7,7 @@ const { verifyToken, verifyAdmin } = require('./middleware'); // Importiere die 
 
 // Verbindung zur PostgreSQL-Datenbank herstellen
 const pool = new Pool({
-  user: 'sa', 
+  user: 'postgres', 
   host: 'localhost', 
   database: 'webmo2024', 
   password: '123', 

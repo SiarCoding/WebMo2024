@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/successMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:visibility="gone"
+        android:text="Plan gespeichert!" />
+
+    <TextView
+        android:id="@+id/errorMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"
+        android:text="Fehler beim Laden der Pläne" />
+
+    <!-- Woche auswählen Spinner -->
+    <Spinner
+        android:id="@+id/weekSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Weitere UI-Elemente, wie Spinner und Buttons für die Auswahl des Essens -->
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Plan speichern" />
+
+    <Button
+        android:id="@+id/viewPlansButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Essenspläne ansehen" />
+
+</LinearLayout>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/card_background"
+    android:layout_marginBottom="8dp"
+    android:elevation="2dp">
+
+    <!-- Wochennummer -->
+    <TextView
+        android:id="@+id/wochennummer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Wochennummer"
+    android:textAppearance="?attr/textAppearanceSubtitle1"
+    android:layout_marginBottom="8dp" />
+
+    <!-- Plan Titel -->
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Bearbeiten Button -->
+    <Button
+        android:id="@+id/buttonEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/edit" />
+
+    <!-- Löschen Button -->
+    <Button
+        android:id="@+id/buttonDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/delete"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
