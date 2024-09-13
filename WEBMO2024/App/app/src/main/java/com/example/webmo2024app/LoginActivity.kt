@@ -12,7 +12,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.util.Log
-
+import com.example.webmo2024app.network.ApiService // Importiere ApiService
 
 class LoginActivity : AppCompatActivity() {
 
@@ -22,9 +22,15 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var buttonLogin: Button
     private lateinit var textViewError: TextView
 
+    // Initialisiere apiService
+    private lateinit var apiService: ApiService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        // Initialisiere die API-Service
+        apiService = RetrofitClient.create(applicationContext)
 
         // Initialisiere die UI-Komponenten
         editTextUsername = findViewById(R.id.editTextUsername)
@@ -48,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
     private fun login() {
         val username = editTextUsername.text.toString()
         val password = editTextPassword.text.toString()
-        val role = spinnerRole.selectedItem.toString()
+        var role = spinnerRole.selectedItem.toString()
 
         if (username.isEmpty() || password.isEmpty()) {
             textViewError.visibility = View.VISIBLE
@@ -62,35 +68,37 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
+        // Konvertiere die Rolle in Kleinbuchstaben
+        role = role.lowercase()
+
         // Erstelle das UserCredentials-Objekt
         val credentials = UserCredentials(username, password, role)
 
         // Führe API-Anfrage für Login durch
-        val call = RetrofitClient.apiService.login(credentials)
+        val call = apiService.login(credentials)
         call.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful && response.body()?.success == true) {
-                    // Erfolgsmeldung und Token speichern
                     val token = response.body()?.token
-                    if (token != null) {
+                    if (!token.isNullOrEmpty()) {
                         getSharedPreferences("app_prefs", MODE_PRIVATE).edit()
                             .putString("token", token)
                             .apply()
 
                         Toast.makeText(this@LoginActivity, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
 
-                        // Nach erfolgreichem Login zur EssenActivity weiterleiten
                         val intent = Intent(this@LoginActivity, EssenActivity::class.java)
                         startActivity(intent)
-                        finish() // Die LoginActivity beenden, damit der Benutzer nicht zurückkehren kann
-
+                        finish()
                     } else {
                         textViewError.visibility = View.VISIBLE
                         textViewError.text = getString(R.string.error_token_missing)
                     }
                 } else {
                     textViewError.visibility = View.VISIBLE
-                    textViewError.text = response.body()?.message ?: getString(R.string.error_message)
+                    val errorMsg = response.errorBody()?.string() ?: getString(R.string.error_message)
+                    textViewError.text = errorMsg
+                    Log.e("LoginActivity", "Login fehlgeschlagen: $errorMsg")
                 }
             }
 
@@ -99,8 +107,6 @@ class LoginActivity : AppCompatActivity() {
                 textViewError.visibility = View.VISIBLE
                 textViewError.text = getString(R.string.error_message)
             }
-
-
         })
     }
 }

@@ -5,24 +5,46 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <!-- TextViews für Essen Informationen -->
     <TextView
         android:id="@+id/textViewEssenName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:text="Essen Name"
+        android:textSize="16sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/textViewEssenBeschreibung"
+        android:id="@+id/textViewEssenType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Essen Typ"
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/textViewBeschreibung"
+        android:id="@+id/textViewEssenPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/description" />
+        android:text="Essen Preis"
+        android:textSize="14sp" />
 
+    <!-- Buttons für Bearbeiten und Löschen -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
 
+        <Button
+            android:id="@+id/buttonBearbeiten"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bearbeiten" />
+
+        <Button
+            android:id="@+id/buttonLoeschen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Löschen" />
+    </LinearLayout>
 </LinearLayout>

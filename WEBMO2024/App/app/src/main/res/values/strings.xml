@@ -60,10 +60,17 @@
         <item>Vegetarisch</item>
         <item>Vegan</item>
         <item>Fleisch</item>
-        <item>Fisch</item>
+        <!-- Füge weitere Typen hinzu, falls nötig -->
     </string-array>
-
+    <!-- res/values/strings.xml -->
+    <string name="please_fill_all_fields">Bitte alle Felder ausfüllen.</string>
+    <string name="food_added_successfully">Essen erfolgreich hinzugefügt!</string>
+    <string name="error_adding_food">Fehler beim Hinzufügen des Essens.</string>
+    <string name="server_error">Serverfehler</string>
     <string name="description">Beschreibung</string>
+
+
+
 
 
 </resources>

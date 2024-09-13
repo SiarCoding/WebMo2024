@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Toolbar mit AppBarLayout -->
+    <!-- AppBarLayout mit Toolbar und Tabs -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,14 +27,41 @@
             android:layout_height="wrap_content"
             app:tabIndicatorColor="@android:color/white"
             app:tabSelectedTextColor="@android:color/white"
-            app:tabTextColor="@android:color/darker_gray" />
+            app:tabTextColor="@android:color/darker_gray">
+
+            <!-- Definiere die Tabs hier -->
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabEssenList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Essensliste" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabAddEssen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Neues Essen hinzufügen" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabEssensplanErstellen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Essensplan erstellen" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabEssensplaene"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Essenspläne" />
+
+        </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Fragment Container für die Inhalte -->
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <!-- ViewPager2 für die Fragments -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
-</LinearLayout>
 
+</LinearLayout>

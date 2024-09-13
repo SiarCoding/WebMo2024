@@ -9,7 +9,7 @@ import com.example.webmo2024app.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+import com.example.webmo2024app.network.ApiService // Füge diesen Import hinzu
 
 class EditPlanActivity : AppCompatActivity() {
 
@@ -23,9 +23,15 @@ class EditPlanActivity : AppCompatActivity() {
     private val essenList = mutableListOf<Essen>()
     private val plan = mutableMapOf<String, String?>()
 
+    // Initialisiere apiService
+    private lateinit var apiService: ApiService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_plan)
+
+        // Initialisiere den API-Service
+        apiService = RetrofitClient.create(applicationContext)
 
         // UI-Komponenten initialisieren
         tvTitle = findViewById(R.id.tvTitle)
@@ -50,7 +56,7 @@ class EditPlanActivity : AppCompatActivity() {
     }
 
     private fun loadEssen() {
-        RetrofitClient.apiService.getAllEssen().enqueue(object : Callback<List<Essen>> {
+        apiService.getAllEssen().enqueue(object : Callback<List<Essen>> {
             override fun onResponse(call: Call<List<Essen>>, response: Response<List<Essen>>) {
                 if (response.isSuccessful) {
                     essenList.clear()
@@ -72,7 +78,6 @@ class EditPlanActivity : AppCompatActivity() {
     }
 
     private fun saveEditedPlan() {
-        // Implementiere die Logik zum Speichern des bearbeiteten Plans
         tvSuccessMessage.text = "Plan erfolgreich gespeichert!"
         tvSuccessMessage.visibility = View.VISIBLE
         tvErrorMessage.visibility = View.GONE

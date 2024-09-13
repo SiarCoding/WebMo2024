@@ -11,6 +11,7 @@ import com.example.webmo2024app.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.example.webmo2024app.network.ApiService // Korrigierter Import der ApiService-Klasse
 
 class EssensplanActivity : AppCompatActivity() {
 
@@ -19,6 +20,10 @@ class EssensplanActivity : AppCompatActivity() {
     private lateinit var viewPlansButton: Button
     private lateinit var successMessage: TextView
     private lateinit var errorMessage: TextView
+
+    // Initialisiere apiService
+    private lateinit var apiService: ApiService
+
     private val plan: MutableMap<String, String?> = mutableMapOf(
         "Montag" to null,
         "Dienstag" to null,
@@ -33,6 +38,9 @@ class EssensplanActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_essensplan)
+
+        // Initialisiere die API-Service
+        apiService = RetrofitClient.create(applicationContext)
 
         weekSpinner = findViewById(R.id.weekSpinner)
         saveButton = findViewById(R.id.saveButton)
@@ -63,50 +71,52 @@ class EssensplanActivity : AppCompatActivity() {
     }
 
     private fun loadEssen() {
-        RetrofitClient.apiService.getAllEssen().enqueue(object : Callback<List<Essen>> {
+        apiService.getAllEssen().enqueue(object : Callback<List<Essen>> {
             override fun onResponse(call: Call<List<Essen>>, response: Response<List<Essen>>) {
                 if (response.isSuccessful) {
                     essenList.clear()
                     essenList.addAll(response.body() ?: emptyList())
-                    // UI-Update, wenn Daten erfolgreich geladen werden
                 } else {
                     errorMessage.text = "Fehler beim Laden der Essen"
+                    errorMessage.visibility = View.VISIBLE // Sichtbarkeit der Fehlermeldung sicherstellen
                 }
             }
 
             override fun onFailure(call: Call<List<Essen>>, t: Throwable) {
                 errorMessage.text = "Fehler beim Laden der Essen: ${t.message}"
+                errorMessage.visibility = View.VISIBLE
             }
         })
     }
 
     private fun loadPlan() {
-        // API-Aufruf, um den Plan für die ausgewählte Woche zu laden
-        RetrofitClient.apiService.getPlanForWeek(selectedWeek).enqueue(object : Callback<PlanResponse> {
+        apiService.getPlanForWeek(selectedWeek).enqueue(object : Callback<PlanResponse> {
             override fun onResponse(call: Call<PlanResponse>, response: Response<PlanResponse>) {
                 if (response.isSuccessful) {
                     val planResponse = response.body()
-                    // Aktualisiere den Plan basierend auf den geladenen Daten
                     plan["Montag"] = planResponse?.monday
                     plan["Dienstag"] = planResponse?.tuesday
                     plan["Mittwoch"] = planResponse?.wednesday
                     plan["Donnerstag"] = planResponse?.thursday
                     plan["Freitag"] = planResponse?.friday
                     successMessage.text = "Plan erfolgreich geladen!"
+                    successMessage.visibility = View.VISIBLE
+                    errorMessage.visibility = View.GONE
                 } else {
                     errorMessage.text = "Fehler beim Laden des Plans"
+                    errorMessage.visibility = View.VISIBLE
                 }
             }
 
             override fun onFailure(call: Call<PlanResponse>, t: Throwable) {
                 errorMessage.text = "Fehler beim Laden des Plans: ${t.message}"
+                errorMessage.visibility = View.VISIBLE
             }
         })
     }
 
     private fun savePlan() {
-        // Beispielhafte Logik, um den Plan zu speichern
-        RetrofitClient.apiService.savePlanForWeek(selectedWeek, plan).enqueue(object : Callback<Void> {
+        apiService.savePlanForWeek(selectedWeek, plan).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     successMessage.text = "Plan erfolgreich gespeichert!"

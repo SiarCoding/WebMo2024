@@ -19,11 +19,13 @@
 
     <!-- Plan Titel -->
     <TextView
-        android:id="@+id/textViewTitle"
+        android:id="@+id/textViewWeek"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:text="Woche"
+        android:textSize="16sp"
         android:layout_marginBottom="8dp" />
+
 
     <!-- Bearbeiten Button -->
     <Button

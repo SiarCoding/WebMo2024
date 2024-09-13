@@ -1,8 +1,5 @@
 package com.example.webmo2024app
 
-
-
-
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +8,8 @@ import com.example.webmo2024app.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.example.webmo2024app.network.ApiService
+
 
 class AddFoodActivity : AppCompatActivity() {
 
@@ -21,9 +20,15 @@ class AddFoodActivity : AppCompatActivity() {
     private lateinit var buttonShowFood: Button
     private lateinit var textMessage: TextView
 
+    // RetrofitClient wird in onCreate initialisiert
+    private lateinit var apiService: ApiService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_essen)
+
+        // Initialisiere apiService hier
+        apiService = RetrofitClient.create(applicationContext)
 
         // UI-Komponenten initialisieren
         inputName = findViewById(R.id.inputName)
@@ -36,7 +41,7 @@ class AddFoodActivity : AppCompatActivity() {
         // Spinner mit Optionen füllen
         val adapter = ArrayAdapter.createFromResource(
             this,
-            R.array.typ,
+            R.array.typ, // Überprüfe, ob du in deiner strings.xml eine Resource mit dem Namen 'typ' hast
             android.R.layout.simple_spinner_item
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -54,28 +59,27 @@ class AddFoodActivity : AppCompatActivity() {
     }
 
     private fun addFood() {
-        val name = inputName.text.toString().trim() // Entferne unnötige Leerzeichen
+        val name = inputName.text.toString().trim()
         val priceText = inputPrice.text.toString()
-        val price = priceText.toDoubleOrNull() ?: 0.0
+        val price = priceText.toFloatOrNull() ?: 0f // Ändere von Double zu Float
         val type = spinnerType.selectedItem.toString()
 
+        // Eingabevalidierung
         if (name.isEmpty() || priceText.isEmpty() || price <= 0 || type.isEmpty()) {
             textMessage.text = "Bitte alle Felder ausfüllen."
             return
         }
 
-        // Restlicher Code bleibt unverändert
-
-
-
-    val token = getToken() // Token abrufen
+        val token = getToken() // Token abrufen
         if (token.isNullOrEmpty()) {
             textMessage.text = "Kein Authentifizierungstoken gefunden."
             return
         }
 
-        val food = Essen(name, price, type)
-        RetrofitClient.apiService.addEssen(food).enqueue(object : Callback<Essen> {
+        val food = Essen(0, name, price, type)
+
+        // Erstelle eine Anfrage mit dem Authorization Header
+        apiService.addEssen(food).enqueue(object : Callback<Essen> {
             override fun onResponse(call: Call<Essen>, response: Response<Essen>) {
                 if (response.isSuccessful) {
                     textMessage.text = "Essen erfolgreich hinzugefügt!"
@@ -94,7 +98,6 @@ class AddFoodActivity : AppCompatActivity() {
     }
 
     private fun getToken(): String? {
-        // Abrufen des gespeicherten Tokens, z.B. von SharedPreferences
         val sharedPref = getSharedPreferences("app_prefs", MODE_PRIVATE)
         return sharedPref.getString("token", null)
     }

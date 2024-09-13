@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class PlansAdapter(
     private val plans: List<Plan>,
-    private val onEdit: (Plan) -> Unit,
-    private val onDelete: (Int) -> Unit
+    private val editPlanCallback: (Plan) -> Unit,
+    private val deletePlanCallback: (Int) -> Unit
 ) : RecyclerView.Adapter<PlansAdapter.PlanViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlanViewHolder {
@@ -30,15 +30,13 @@ class PlansAdapter(
     override fun getItemCount(): Int = plans.size
 
     inner class PlanViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val textViewTitle: TextView = itemView.findViewById(R.id.textViewTitle)
-        private val buttonEdit: Button = itemView.findViewById(R.id.buttonEdit)
-        private val buttonDelete: Button = itemView.findViewById(R.id.buttonDelete)
+        private val textViewWeek: TextView = itemView.findViewById(R.id.textViewWeek)
 
         fun bind(plan: Plan) {
-            textViewTitle.text = itemView.context.getString(R.string.plan_for_week, plan.week)
-            buttonEdit.setOnClickListener { onEdit(plan) }
-            buttonDelete.setOnClickListener { onDelete(plan.week) }
+            textViewWeek.text = "Woche: ${plan.week_number}" // Beispiel für die korrekte Nutzung von 'week_number'
+            // Weitere Setups und Listener hier
         }
     }
 }
+
 
