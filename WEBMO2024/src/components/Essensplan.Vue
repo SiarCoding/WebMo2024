@@ -7,7 +7,7 @@
     </h2>
     
     <div class="mb-4 text-center">
-      <label for="week-select" class="form-label">{{ $t('pages.select_week') }}</label>
+      <label for="week-select" class="form-label fw-bold">{{ $t('pages.select_week') }}</label>
       <select id="week-select" v-model="selectedWeek" class="form-select w-25 mx-auto">
         <option v-for="week in 8" :key="week" :value="week">{{ $t('pages.week') }} {{ week }}</option>
       </select>
@@ -16,7 +16,7 @@
     <!-- Auswahl der Mahlzeiten für die Tage -->
     <div class="row">
       <div class="col-md-6 mb-3" v-for="(mealId, day) in plan" :key="day">
-        <div class="card">
+        <div class="card h-100 shadow-sm">
           <div class="card-body">
             <h5 class="card-title">{{ $t('pages.days.' + day) }}</h5>
             <select v-model="plan[day]" class="form-select">
@@ -140,5 +140,29 @@ export default {
 
 .me-2 {
   margin-right: 0.5rem;
+}
+
+.form-select {
+  font-size: 1.1rem;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.card {
+  border-radius: 10px;
+  background-color: #f8f9fa;
+}
+
+.text-center {
+  margin-bottom: 1.5rem;
+}
+
+.text-success {
+  color: green;
 }
 </style>

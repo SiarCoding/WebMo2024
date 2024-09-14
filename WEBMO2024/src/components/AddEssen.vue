@@ -1,12 +1,11 @@
 <template>
   <div class="container mt-5">
-    <!-- Verwende Bootstrap Icon statt Emoji -->
     <h2 class="mb-4 text-center display-5">
       <i class="bi bi-egg-fried"></i> <!-- Bootstrap Icon für Essen -->
       {{ $t('pages.add_food') }}
     </h2>
     
-    <form @submit.prevent="hinzufuegen" class="card p-4 shadow-lg" style="background-color: #f5fafd; border-radius: 10px;">
+    <form @submit.prevent="hinzufuegen" class="card p-4 shadow-lg" style="background-color: #f8f9fa; border-radius: 10px;">
       <div class="mb-3">
         <label for="name" class="form-label fw-bold">{{ $t('pages.food_name') }}:</label>
         <input 
@@ -49,12 +48,12 @@
         </select>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100 btn-lg shadow-sm">{{ $t('pages.add_food') }}</button>
+      <button type="submit" class="btn btn-primary w-100 btn-lg shadow-sm">{{ $t('pages.save_food') }}</button>
     </form>
 
     <!-- "Essen anzeigen" Button -->
     <div class="text-center mt-4">
-      <button @click="showEssen" class="btn btn-secondary btn-lg shadow-sm">{{ $t('pages.view_food') }}</button>
+      <button @click="showEssen" class="btn btn-warning btn-lg shadow-sm">{{ $t('pages.view_food') }}</button>
     </div>
 
     <p v-if="message" class="mt-3 text-success text-center fw-bold">{{ message }}</p>
@@ -131,17 +130,26 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 700px;
+  max-width: 800px;
 }
 
-.form-label {
+.card-title {
+  margin-bottom: 15px;
+}
+
+.text-danger,
+.text-success {
+  font-weight: bold;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.form-select {
   font-size: 1.1rem;
-}
-
-input.form-control-lg,
-select.form-select-lg,
-.button.btn-lg {
-  font-size: 1.2rem;
+  padding: 10px;
+  border-radius: 5px;
 }
 
 .btn-primary {
@@ -149,16 +157,21 @@ select.form-select-lg,
   border-color: #007bff;
 }
 
-.btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.text-center {
+  margin-bottom: 1.5rem;
 }
 
 .card {
   border-radius: 10px;
+  background-color: #f8f9fa;
 }
 
 .text-success {
-  font-weight: bold;
+  color: green;
 }
 </style>

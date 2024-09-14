@@ -2,45 +2,56 @@
   <div id="app">
     <nav class="navbar navbar-expand-lg navbar-light bg-custom shadow-sm">
       <div class="container">
-        <a class="navbar-brand fw-bold text-light" href="#">{{ $t('pages.app_name') }}</a>
+        <a class="navbar-brand fw-bold text-light" href="#">
+          <i class="bi bi-house-door-fill"></i> <!-- Home Icon -->
+          {{ $t('pages.app_name') }}
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
+            <!-- Essen List -->
             <li class="nav-item">
               <router-link 
                 class="nav-link text-light" 
                 :class="{ 'active bg-highlight': isActive('/essen') }" 
                 to="/essen"
               >
+                <i class="bi bi-list"></i> <!-- List Icon -->
                 {{ $t('pages.essen_list') }}
               </router-link>
             </li>
+            <!-- Add Food -->
             <li class="nav-item">
               <router-link 
                 class="nav-link text-light" 
                 :class="{ 'active bg-highlight': isActive('/add-essen') }" 
                 to="/add-essen"
               >
+                <i class="bi bi-plus-circle-fill"></i> <!-- Add Icon -->
                 {{ $t('pages.add_food') }}
               </router-link>
             </li>
+            <!-- Create Meal Plan -->
             <li class="nav-item">
               <router-link 
                 class="nav-link text-light" 
                 :class="{ 'active bg-highlight': isActive('/essensplan') }" 
                 to="/essensplan"
               >
+                <i class="bi bi-calendar-check"></i> <!-- Calendar Icon -->
                 {{ $t('pages.create_meal_plan') }}
               </router-link>
             </li>
+            <!-- View Meal Plans -->
             <li class="nav-item">
               <router-link 
                 class="nav-link text-light" 
                 :class="{ 'active bg-highlight': isActive('/plaene') }" 
                 to="/plaene"
               >
+                <i class="bi bi-file-earmark-text"></i> <!-- File Icon -->
                 {{ $t('pages.view_meal_plans') }}
               </router-link>
             </li>
@@ -48,6 +59,7 @@
 
           <!-- User Info -->
           <span class="navbar-text text-light me-3">
+            <i class="bi bi-person-circle"></i> <!-- User Icon -->
             {{ $t('pages.loggedInAs') }}: {{ userRole || 'User' }}
           </span>
 
@@ -58,7 +70,10 @@
           </select>
 
           <!-- Logout Button -->
-          <button class="btn btn-outline-light btn-sm" @click="logout">{{ $t('pages.logout') }}</button>
+          <button class="btn btn-outline-light btn-sm" @click="logout">
+            <i class="bi bi-box-arrow-right"></i> <!-- Logout Icon -->
+            {{ $t('pages.logout') }}
+          </button>
         </div>
       </div>
     </nav>
