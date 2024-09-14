@@ -1,6 +1,10 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center display-5">{{ $t('pages.essen_list') }}</h2>
+    <!-- Titel mit Bootstrap Icon -->
+    <h2 class="mb-4 text-center display-5">
+      <i class="bi bi-basket"></i>  <!-- Bootstrap Icon für "Essen" -->
+      {{ $t('pages.essen_list') }}
+    </h2>
 
     <div class="row">
       <div class="col-md-4 mb-4" v-for="item in essenList" :key="item.id">

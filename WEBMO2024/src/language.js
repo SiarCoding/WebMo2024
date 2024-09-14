@@ -36,6 +36,7 @@ const messages = {
         Mittwoch: 'Wednesday',
         Donnerstag: 'Thursday',
         Freitag: 'Friday',
+        wochentag: 'Day of the Week' // Neuer Eintrag
       },
       total_price: 'Total Price',
       no_plan_for_week: 'No plan for week',
@@ -78,6 +79,7 @@ const messages = {
         Mittwoch: 'Mittwoch',
         Donnerstag: 'Donnerstag',
         Freitag: 'Freitag',
+        wochentag: 'Wochentag' // Neuer Eintrag
       },
       total_price: 'Gesamtpreis',
       no_plan_for_week: 'Kein Plan für Woche',

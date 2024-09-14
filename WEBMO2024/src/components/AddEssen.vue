@@ -1,6 +1,10 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center display-5">🍽️ {{ $t('pages.add_food') }}</h2>
+    <!-- Verwende Bootstrap Icon statt Emoji -->
+    <h2 class="mb-4 text-center display-5">
+      <i class="bi bi-egg-fried"></i> <!-- Bootstrap Icon für Essen -->
+      {{ $t('pages.add_food') }}
+    </h2>
     
     <form @submit.prevent="hinzufuegen" class="card p-4 shadow-lg" style="background-color: #f5fafd; border-radius: 10px;">
       <div class="mb-3">

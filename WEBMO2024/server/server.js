@@ -7,7 +7,7 @@ const { verifyToken, verifyAdmin } = require('./middleware'); // Importiere die 
 
 // Verbindung zur PostgreSQL-Datenbank herstellen
 const pool = new Pool({
-  user: 'postgres', 
+  user: 'sa', 
   host: 'localhost', 
   database: 'webmo2024', 
   password: '123', 
@@ -223,11 +223,10 @@ app.post('/api/essensplan', async (req, res) => {
 
 
 
-// GET-Route zum Abrufen aller Essenspläne
 app.get('/api/essensplan', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT p.plan_id, p.week_number, l.day_of_week, l.food_id, e.name AS food_name, e.price
+      SELECT p.plan_id, p.week_number, l.day_of_week, l.food_id, e.name AS food_name, e.price, e.type
       FROM foodplan p
       LEFT JOIN food_in_plan l ON p.plan_id = l.plan_id
       LEFT JOIN food e ON l.food_id = e.id
@@ -256,7 +255,8 @@ app.get('/api/essensplan', async (req, res) => {
         plans[row.week_number].days[row.day_of_week] = {
           food_id: row.food_id,
           food_name: row.food_name,
-          price: parseFloat(row.price)
+          price: parseFloat(row.price),
+          type: row.type // Füge den food type hinzu
         };
         plans[row.week_number].total_price += parseFloat(row.price);
       }
@@ -268,6 +268,7 @@ app.get('/api/essensplan', async (req, res) => {
     res.status(500).json({ success: false, message: 'Serverfehler beim Abrufen der Essenspläne' });
   }
 });
+
 
 // GET-Route zum Abrufen eines bestimmten Essensplans nach Woche
 app.get('/api/essensplan/:week', async (req, res) => {

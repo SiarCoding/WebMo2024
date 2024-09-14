@@ -1,6 +1,11 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center display-5">{{ $t('pages.create_meal_plan') }}</h2>
+    <!-- Bootstrap Icon für den Titel -->
+    <h2 class="mb-4 text-center display-5">
+      <i class="bi bi-calendar3"></i> <!-- Bootstrap Icon hinzugefügt -->
+      {{ $t('pages.create_meal_plan') }}
+    </h2>
+    
     <div class="mb-4 text-center">
       <label for="week-select" class="form-label">{{ $t('pages.select_week') }}</label>
       <select id="week-select" v-model="selectedWeek" class="form-select w-25 mx-auto">
