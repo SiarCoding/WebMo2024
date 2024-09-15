@@ -2,10 +2,10 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
     user: 'sa', // Benutzername
-    host: 'db', // Hostname der Datenbank
+    host: 'db', // Hostname Lokal:localhost, docker:db
     database: 'webmo2024', // Datenbankname
-    password: '123', // Korrekt: Schlüsselwort ist "password"
-    port: 5432, // Standardport für PostgreSQL
+    password: '123', // passwort
+    port: 5432, // port
 });
 
 module.exports = pool;

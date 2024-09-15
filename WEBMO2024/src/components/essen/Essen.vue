@@ -15,7 +15,9 @@
               {{ $t('pages.food_price') }}: {{ item.price }}€
             </h6>
             <p class="card-text">{{ item.beschreibung }}</p>
-            <p class="badge bg-info">{{ $t('pages.' + translateType(item.type)) }}</p>
+            <p :class="getBadgeClass(item.type)">
+              {{ $t('pages.' + translateType(item.type)) }}
+            </p>
           </div>
           <div class="card-footer d-flex justify-content-between" v-if="isAdmin">
             <button @click="goToEditPage(item)" class="btn btn-primary">
@@ -41,7 +43,7 @@ export default {
       isAdmin: localStorage.getItem('role') === 'admin',
     };
   },
-  methods: {
+  methods: { //essen wird geladen
     async loadEssen() {
       try {
         const { data } = await axios.get('http://localhost:3001/api/essen');
@@ -50,7 +52,7 @@ export default {
         console.error('Fehler beim Laden der Essen:', error);
       }
     },
-    async deleteEssen(id) {
+    async deleteEssen(id) { //Essen wird gelöscht 
       try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -86,6 +88,12 @@ export default {
       };
       return types[type] || type;
     },
+    getBadgeClass(type) {
+      if (type === 'vegan') return 'badge bg-lavender text-dark';
+      if (type === 'vegetarisch') return 'badge bg-peach text-dark';
+      if (type === 'mit Fleisch') return 'badge bg-lightpink text-white';
+      return 'badge bg-secondary text-white';
+    },
   },
   created() {
     this.loadEssen();
@@ -101,7 +109,7 @@ export default {
 }
 
 .card {
-  background-color: #cf93d7;
+  background-color: #f9f9f9;
   transition: transform 0.2s ease-in-out;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
@@ -125,5 +133,22 @@ export default {
   font-size: 1rem;
   font-weight: 400;
   color: #6c757d;
+}
+
+.bg-lavender {
+  background-color: #E6E6FA;
+}
+
+.bg-peach {
+  background-color: #FFDAB9;
+}
+
+.bg-lightpink {
+  background-color: #FFB6C1;
+}
+
+.bg-secondary {
+  background-color: #6c757d;
+  color: white;
 }
 </style>
