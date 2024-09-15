@@ -10,7 +10,7 @@
     "serve": "vue-cli-service serve",
     "test": "playwright test",
     "start-all": "concurrently \"npm run start-server\" \"npm run start-client\"",
-    "start-server": "cd server && node server.js",
+    "start-server": "node server/server.js",
     "start-client": "vite"
   },
   "dependencies": {
@@ -30,7 +30,7 @@
     "@vitejs/plugin-vue": "^5.0.5",
     "@vitejs/plugin-vue-jsx": "^4.0.0",
     "@vue/compiler-sfc": "^3.4.37",
-    "concurrently": "^9.0.0",
+    "concurrently": "^9.0.1",
     "typescript": "^5.5.4",
     "vite": "^5.3.1"
   }
