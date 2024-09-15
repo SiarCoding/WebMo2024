@@ -5,16 +5,8 @@ const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const { verifyToken, verifyAdmin } = require('./middleware'); // Importiere die Middleware-Funktionen
 
-// Verbindung zur PostgreSQL-Datenbank herstellen (Server ist lokal)
-const pool = new Pool({
-  user: 'sa', 
-  host: 'localhost', 
-  database: 'webmo2024', 
-  password: '123', 
-  port: 5432
-});
-
 const app = express(); //vereinfacht die verwaltung und die Erstellung von Routen
+const pool = require('./db/db'); //db import
 
 // Middleware Konfigurationen
 app.use(bodyParser.json());
@@ -423,7 +415,7 @@ app.delete('/api/essensplan/:id', async (req, res) => {
 
   try {
     const planId = parseInt(id, 10);
-    
+
     // Lösche alle Einträge des Plans
     await pool.query('DELETE FROM food_in_plan WHERE plan_id = $1', [planId]);
     const deletePlanResult = await pool.query('DELETE FROM foodplan WHERE plan_id = $1 RETURNING *', [planId]);
