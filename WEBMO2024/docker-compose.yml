@@ -1,33 +1,37 @@
-version: '3.1'
+version: '3.9'
 
 services:
   db:
     image: postgres:14
     environment:
-      POSTGRES_USER: sa           # Benutzername
-      POSTGRES_PASSWORD: 123       # Passwort
-      POSTGRES_DB: webmo2024       # Datenbankname
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: webmo2024
     volumes:
-      - ./data:/var/lib/postgresql/data  # Stellt sicher, dass Daten persistent sind
-      - ./db-init:/docker-entrypoint-initdb.d  # Lädt SQL-Dateien beim ersten Start
+      - ./db-init:/docker-entrypoint-initdb.d  # Dein backup.sql wird geladen und ausgeführt
+      - ./data:/var/lib/postgresql/data  # Persistiert Daten, um sie nach Neustarts zu behalten
     ports:
-      - "5432:5432"                # PostgreSQL Standardport
+      - "5432:5432"  # Datenbank ist auf diesem Port erreichbar
 
-  app:
-    build: .
+  backend:
+    build:
+      context: ./server  # Verzeichnis des Backends
+      dockerfile: Dockerfile  # Dockerfile im /server-Verzeichnis
     volumes:
-      - .:/usr/src/app
+      - ./server:/usr/src/app  # Das Verzeichnis des Backend-Codes wird eingebunden
+      - /usr/src/app/node_modules  # Verhindert Konflikte mit node_modules
     ports:
-      - "3001:3001"                # Der Port deines Backends
+      - "3001:3001"  # Backend läuft auf Port 3001
     depends_on:
-      - db
+      - db  # Das Backend wartet auf die Datenbank
+    environment:
+      DATABASE_URL: postgres://sa:123@db:5432/webmo2024  # Verbindung zur PostgreSQL-Datenbank
 
-  # Optional: Client-Service für das Frontend
-  client:
-    build: .
-    volumes:
-      - .:/usr/src/client
+  frontend:
+    build:
+      context: .  # Verzeichnis des Frontends ist das Root-Verzeichnis
+      dockerfile: Dockerfile  # Dockerfile im Root-Verzeichnis
     ports:
-      - "5173:5173"                # Port für das Vue-Frontend (Vite Development Server)
+      - "5173:80"  # Vue.js-Frontend läuft über Nginx auf Port 80, wird auf 5173 gemappt
     depends_on:
-      - app
+      - backend  # Frontend wartet, bis das Backend bereit ist
