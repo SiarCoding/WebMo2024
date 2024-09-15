@@ -197,8 +197,8 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.food (id, name, price, type) FROM stdin;
-40	Döner mit Zwiebel	5.02	vegan
-49	Ei	20.00	vegetarisch
+40	Döner	5.00	vegan
+49	Ei	2.00	vegetarisch
 50	Gekochtes Ei	4.00	vegetarisch
 52	Biryani	8.98	vegetarisch
 51	Thai-Curry	4.92	vegan
