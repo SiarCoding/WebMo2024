@@ -14,6 +14,14 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp" />
 
+    <!-- Fragment-Container -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Spinner für Tage -->
     <Spinner
         android:id="@+id/spinnerDays"
         android:layout_width="match_parent"
@@ -21,18 +29,21 @@
         android:entries="@array/tag"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Spinner für Mahlzeiten -->
     <Spinner
         android:id="@+id/spinnerMeals"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Button zum Speichern des Plans -->
     <Button
         android:id="@+id/btnSavePlan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Plan speichern" />
 
+    <!-- Button zum Ansehen der Pläne -->
     <Button
         android:id="@+id/btnViewPlans"
         android:layout_width="match_parent"
@@ -40,6 +51,7 @@
         android:text="Essenspläne ansehen"
         android:layout_marginTop="8dp" />
 
+    <!-- Erfolgsmeldung -->
     <TextView
         android:id="@+id/tvSuccessMessage"
         android:layout_width="wrap_content"
@@ -49,6 +61,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp" />
 
+    <!-- Fehlermeldung -->
     <TextView
         android:id="@+id/tvErrorMessage"
         android:layout_width="wrap_content"

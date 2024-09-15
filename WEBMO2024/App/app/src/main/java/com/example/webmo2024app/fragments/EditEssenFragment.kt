@@ -8,13 +8,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import com.example.webmo2024app.R
-import com.example.webmo2024app.model.Essen
 import com.example.webmo2024app.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.example.webmo2024app.network.ApiService
+import com.example.webmo2024app.model.Essen
+
 
 class EditEssenFragment : Fragment() {
 
@@ -32,7 +34,7 @@ class EditEssenFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_edit_essen, container, false)
 
-        // Initialisiere die API-Service
+        // Initialisiere den API-Service
         apiService = RetrofitClient.create(requireContext())
 
         nameEditText = view.findViewById(R.id.editTextName)
@@ -63,14 +65,20 @@ class EditEssenFragment : Fragment() {
         val type = typeEditText.text.toString()
 
         if (name.isNotEmpty() && price != null && type.isNotEmpty()) {
-            val updatedEssen = Essen(
-                id = essen?.id ?: 0, // Nutze die vorhandene ID oder 0, falls es ein neues Essen ist
-                name = name,
-                price = price,
-                type = type
+            val token = getToken() ?: ""
+            if (token.isEmpty()) {
+                Toast.makeText(context, "Kein Authentifizierungstoken gefunden.", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // Erstelle eine Map für die zu aktualisierenden Daten
+            val updatedEssenData = mapOf(
+                "name" to name,
+                "preis" to price,
+                "art" to type
             )
 
-            val call = apiService.updateEssen(updatedEssen.id!!, updatedEssen)
+            val call = apiService.updateEssen("Bearer $token", essen?.id ?: 0, updatedEssenData)
             call.enqueue(object : Callback<Essen> {
                 override fun onResponse(call: Call<Essen>, response: Response<Essen>) {
                     if (response.isSuccessful) {
@@ -88,5 +96,10 @@ class EditEssenFragment : Fragment() {
         } else {
             Toast.makeText(context, "Bitte alle Felder korrekt ausfüllen", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun getToken(): String? {
+        val sharedPref = requireContext().getSharedPreferences("app_prefs", AppCompatActivity.MODE_PRIVATE)
+        return sharedPref.getString("token", null)
     }
 }

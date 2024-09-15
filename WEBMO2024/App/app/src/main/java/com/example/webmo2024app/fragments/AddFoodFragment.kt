@@ -1,28 +1,28 @@
 package com.example.webmo2024app.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import com.example.webmo2024app.R
-import com.example.webmo2024app.model.Essen
 import com.example.webmo2024app.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.example.webmo2024app.network.ApiService
+import com.example.webmo2024app.model.Essen
 
 class AddFoodFragment : Fragment() {
 
     private lateinit var nameEditText: EditText
     private lateinit var priceEditText: EditText
-    private lateinit var typeEditText: EditText
+    private lateinit var typeSpinner: Spinner
     private lateinit var addButton: Button
-
+    private lateinit var messageTextView: TextView
     private lateinit var apiService: ApiService
 
     override fun onCreateView(
@@ -31,52 +31,79 @@ class AddFoodFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_add_food, container, false)
 
-        // Initialisiere den ApiService
-        apiService = RetrofitClient.create(requireContext())
-
-        // Initialisiere die UI-Komponenten
+        // Initialize the UI components
         nameEditText = view.findViewById(R.id.editTextName)
         priceEditText = view.findViewById(R.id.editTextPrice)
-        typeEditText = view.findViewById(R.id.editTextType)
+        typeSpinner = view.findViewById(R.id.spinnerType)
         addButton = view.findViewById(R.id.buttonAdd)
+        messageTextView = view.findViewById(R.id.textMessage)
+
+        // Initialize the ApiService
+        apiService = RetrofitClient.create(requireContext())
+
+        // Set up the spinner with options
+        val types = arrayOf("Vegan", "Mit Fleisch", "Vegetarisch")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, types)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        typeSpinner.adapter = adapter
 
         addButton.setOnClickListener {
-            val name = nameEditText.text.toString()
-            val price = priceEditText.text.toString().toFloatOrNull()
-            val type = typeEditText.text.toString()
-
-            // Überprüfen, ob alle Felder korrekt ausgefüllt sind
-            if (name.isNotEmpty() && price != null && type.isNotEmpty()) {
-                val newEssen = Essen(
-                    id = 0,  // Setze die ID auf 0 oder lasse sie null, wenn sie vom Server generiert wird
-                    name = name,
-                    price = price,
-                    type = type
-                )
-                addEssen(newEssen)
-            } else {
-                Toast.makeText(context, "Bitte füllen Sie alle Felder korrekt aus", Toast.LENGTH_SHORT).show()
-            }
+            addFood()
         }
 
         return view
     }
 
-    private fun addEssen(essen: Essen) {
-        // Verwende den initialisierten apiService
-        val call = apiService.addEssen(essen)
-        call.enqueue(object : Callback<Essen> {
+    private fun addFood() {
+        val name = nameEditText.text.toString().trim()
+        val priceText = priceEditText.text.toString().trim()
+        val price = priceText.toFloatOrNull() ?: 0f
+        val type = typeSpinner.selectedItem.toString()
+
+        // Input validation
+        if (name.isEmpty() || priceText.isEmpty() || price <= 0 || type.isEmpty()) {
+            messageTextView.text = getString(R.string.please_fill_all_fields)
+            return
+        }
+
+        // Retrieve token
+        val token = getToken() ?: ""
+        if (token.isEmpty()) {
+            messageTextView.text = getString(R.string.error_token_missing)
+            return
+        }
+
+        // Create a new Essen object
+        val foodData = Essen(
+            id = 0, // Set id to 0 or any default value if the ID is not needed for creation
+            name = name,
+            price = price,
+            type = type
+        )
+
+        // API call with the correct token
+        apiService.addEssen("Bearer $token", foodData).enqueue(object : Callback<Essen> {
             override fun onResponse(call: Call<Essen>, response: Response<Essen>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "Essen erfolgreich hinzugefügt", Toast.LENGTH_SHORT).show()
+                    messageTextView.text = getString(R.string.food_added_successfully)
+                    nameEditText.text.clear()
+                    priceEditText.text.clear()
+                    typeSpinner.setSelection(0)
                 } else {
-                    Toast.makeText(context, "Fehler beim Hinzufügen des Essens", Toast.LENGTH_SHORT).show()
+                    Log.e("AddFoodFragment", "Fehler beim Hinzufügen des Essens: ${response.errorBody()?.string()}")
+                    messageTextView.text = getString(R.string.error_adding_food)
                 }
             }
 
             override fun onFailure(call: Call<Essen>, t: Throwable) {
-                Toast.makeText(context, "Netzwerkfehler: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("AddFoodFragment", "Serverfehler: ${t.message}")
+                messageTextView.text = getString(R.string.server_error)
             }
         })
+    }
+
+    private fun getToken(): String? {
+        val sharedPref = requireContext().getSharedPreferences("app_prefs", AppCompatActivity.MODE_PRIVATE)
+        return sharedPref.getString("token", null)
     }
 }

@@ -1,9 +1,10 @@
 package com.example.webmo2024app.model
 
 data class PlanResponse(
-    val monday: String?,
-    val tuesday: String?,
-    val wednesday: String?,
-    val thursday: String?,
-    val friday: String?
+    val plan_id: Int,
+    val week_number: Int,
+    val days: Map<String, Meal>,
+    val total_price: Double
 )
+
+

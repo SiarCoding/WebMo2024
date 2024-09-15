@@ -1,44 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/successMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_green_dark"
-        android:visibility="gone"
-        android:text="Plan gespeichert!" />
-
-    <TextView
-        android:id="@+id/errorMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_red_dark"
-        android:visibility="gone"
-        android:text="Fehler beim Laden der Pläne" />
-
-    <!-- Woche auswählen Spinner -->
-    <Spinner
-        android:id="@+id/weekSpinner"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <!-- Weitere UI-Elemente, wie Spinner und Buttons für die Auswahl des Essens -->
-
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Plan speichern" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/viewPlansButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Essenspläne ansehen" />
+        <!-- Spinner für die Wochenauswahl -->
+        <Spinner
+            android:id="@+id/weekSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
 
-</LinearLayout>
+        <!-- Button zum Speichern -->
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Plan speichern"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Button zum Anzeigen der Pläne -->
+        <Button
+            android:id="@+id/viewPlansButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pläne anzeigen"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Button zum Löschen des Plans -->
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Plan löschen"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Nachricht bei Erfolg -->
+        <TextView
+            android:id="@+id/successMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Plan erfolgreich geladen!"
+            android:textColor="@android:color/holo_green_dark"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Nachricht bei Fehler -->
+        <TextView
+            android:id="@+id/errorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fehler beim Laden des Plans"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

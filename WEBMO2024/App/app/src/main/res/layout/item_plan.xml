@@ -11,11 +11,11 @@
     <!-- Wochennummer -->
     <TextView
         android:id="@+id/wochennummer"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Wochennummer"
-    android:textAppearance="?attr/textAppearanceSubtitle1"
-    android:layout_marginBottom="8dp" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wochennummer"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:layout_marginBottom="8dp" />
 
     <!-- Plan Titel -->
     <TextView
@@ -26,13 +26,13 @@
         android:textSize="16sp"
         android:layout_marginBottom="8dp" />
 
-
     <!-- Bearbeiten Button -->
     <Button
         android:id="@+id/buttonEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/edit" />
+        android:text="@string/edit"
+        android:visibility="gone" /> <!-- Standardmäßig ausgeblendet für Nicht-Admins -->
 
     <!-- Löschen Button -->
     <Button
@@ -40,5 +40,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/delete"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:visibility="gone" /> <!-- Standardmäßig ausgeblendet für Nicht-Admins -->
 </LinearLayout>

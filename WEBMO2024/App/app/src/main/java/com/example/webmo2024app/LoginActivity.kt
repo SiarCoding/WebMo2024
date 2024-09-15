@@ -12,7 +12,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.util.Log
-import com.example.webmo2024app.network.ApiService // Importiere ApiService
+import com.example.webmo2024app.network.ApiService
 
 class LoginActivity : AppCompatActivity() {
 
@@ -80,23 +80,31 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful && response.body()?.success == true) {
                     val token = response.body()?.token
-                    if (!token.isNullOrEmpty()) {
-                        getSharedPreferences("app_prefs", MODE_PRIVATE).edit()
-                            .putString("token", token)
-                            .apply()
+                    val userRole = response.body()?.role
 
-                        Toast.makeText(this@LoginActivity, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
-
-                        val intent = Intent(this@LoginActivity, EssenActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        textViewError.visibility = View.VISIBLE
-                        textViewError.text = getString(R.string.error_token_missing)
+                    // Speichere die Benutzerrolle und den Token in SharedPreferences
+                    val editor = getSharedPreferences("app_prefs", MODE_PRIVATE).edit()
+                    if (!userRole.isNullOrEmpty()) {
+                        editor.putString("role", userRole)
                     }
+                    if (!token.isNullOrEmpty()) {
+                        editor.putString("token", token)
+                    }
+                    editor.apply()
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        getString(R.string.login_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    val intent = Intent(this@LoginActivity, EssenActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 } else {
                     textViewError.visibility = View.VISIBLE
-                    val errorMsg = response.errorBody()?.string() ?: getString(R.string.error_message)
+                    val errorMsg =
+                        response.errorBody()?.string() ?: getString(R.string.error_message)
                     textViewError.text = errorMsg
                     Log.e("LoginActivity", "Login fehlgeschlagen: $errorMsg")
                 }
@@ -110,3 +118,4 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 }
+

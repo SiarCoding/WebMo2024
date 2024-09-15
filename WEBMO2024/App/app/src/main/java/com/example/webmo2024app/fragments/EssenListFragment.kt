@@ -16,6 +16,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import com.example.webmo2024app.EssenAdapter
 import com.example.webmo2024app.network.ApiService
+import androidx.appcompat.app.AppCompatActivity
+
 
 class EssenListFragment : Fragment() {
 
@@ -53,8 +55,15 @@ class EssenListFragment : Fragment() {
 
     // Methode zum Abrufen der Essensdaten vom Server
     private fun fetchEssenData() {
+        // Token abrufen
+        val token = getToken() ?: ""
+        if (token.isEmpty()) {
+            Toast.makeText(context, "Kein Authentifizierungstoken gefunden.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         // Verwende den initialisierten apiService
-        val call = apiService.getAllEssen()
+        val call = apiService.getAllEssen("Bearer $token")
         call.enqueue(object : Callback<List<Essen>> {
             override fun onResponse(call: Call<List<Essen>>, response: Response<List<Essen>>) {
                 if (response.isSuccessful) {
@@ -82,7 +91,13 @@ class EssenListFragment : Fragment() {
 
     // Methode zum Löschen eines Essens
     private fun deleteEssen(essen: Essen) {
-        val call = apiService.deleteEssen(essen.id!!)
+        val token = getToken() ?: ""
+        if (token.isEmpty()) {
+            Toast.makeText(context, "Kein Authentifizierungstoken gefunden.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val call = apiService.deleteEssen("Bearer $token", essen.id!!)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
@@ -99,5 +114,11 @@ class EssenListFragment : Fragment() {
                 Toast.makeText(context, "Netzwerkfehler: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    // Methode zum Abrufen des Tokens aus SharedPreferences
+    private fun getToken(): String? {
+        val sharedPref = requireContext().getSharedPreferences("app_prefs", AppCompatActivity.MODE_PRIVATE)
+        return sharedPref.getString("token", null)
     }
 }

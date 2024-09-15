@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -31,19 +30,46 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity normal definieren -->
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:exported="true" />
-
         <!-- EssenActivity hinzufügen -->
         <activity
             android:name=".EssenActivity"
-            android:label="Essen"
+            android:label="@string/essen"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
+        <!-- EditPlanActivity hinzufügen -->
+        <activity
+            android:name=".EditPlanActivity"
+            android:label="@string/edit_plan"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            tools:targetApi="33"
+            android:enableOnBackInvokedCallback="true"/> <!-- Bedingte Anwendung des Attributs für API-Level 33+ -->
+
+        <!-- EssensplanActivity hinzufügen -->
+        <activity
+            android:name=".EssensplanActivity"
+            android:label="@string/essensplan"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- PlaeneActivity hinzufügen -->
+        <activity
+            android:name=".PlaeneActivity"
+            android:label="@string/plaene"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:enableOnBackInvokedCallback="true"
+            tools:targetApi="33" />
+
+
+        <!-- AddFoodActivity hinzufügen -->
+        <activity
+            android:name=".AddFoodActivity"
+            android:label="@string/add_food"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- Weitere Activities oder Services, falls benötigt -->
     </application>
 </manifest>

@@ -13,6 +13,7 @@ import com.example.webmo2024app.fragments.EssensplanErstellenFragment // Importi
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
+
 class EssenActivity : AppCompatActivity() {
 
     private lateinit var tabLayout: TabLayout

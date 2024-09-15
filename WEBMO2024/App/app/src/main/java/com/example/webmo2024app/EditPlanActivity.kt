@@ -9,7 +9,10 @@ import com.example.webmo2024app.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.example.webmo2024app.network.ApiService // Füge diesen Import hinzu
+import com.example.webmo2024app.network.ApiService
+import com.example.webmo2024app.model.PlanDetail
+import com.example.webmo2024app.model.PlanEntry
+import com.example.webmo2024app.model.PlanResponse // Import hinzufügen
 
 class EditPlanActivity : AppCompatActivity() {
 
@@ -23,14 +26,14 @@ class EditPlanActivity : AppCompatActivity() {
     private val essenList = mutableListOf<Essen>()
     private val plan = mutableMapOf<String, String?>()
 
-    // Initialisiere apiService
     private lateinit var apiService: ApiService
+    private var selectedWeek: Int = 1 // Initialisiere die Variable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_plan)
 
-        // Initialisiere den API-Service
+        // API-Service initialisieren
         apiService = RetrofitClient.create(applicationContext)
 
         // UI-Komponenten initialisieren
@@ -56,12 +59,24 @@ class EditPlanActivity : AppCompatActivity() {
     }
 
     private fun loadEssen() {
-        apiService.getAllEssen().enqueue(object : Callback<List<Essen>> {
+        // Token abrufen
+        val token = getToken() ?: ""
+        if (token.isEmpty()) {
+            tvErrorMessage.text = "Kein Authentifizierungstoken gefunden."
+            tvErrorMessage.visibility = View.VISIBLE
+            return
+        }
+
+        apiService.getAllEssen("Bearer $token").enqueue(object : Callback<List<Essen>> {
             override fun onResponse(call: Call<List<Essen>>, response: Response<List<Essen>>) {
                 if (response.isSuccessful) {
                     essenList.clear()
                     essenList.addAll(response.body() ?: emptyList())
-                    val adapter = ArrayAdapter(this@EditPlanActivity, android.R.layout.simple_spinner_item, essenList.map { it.name })
+                    val adapter = ArrayAdapter(
+                        this@EditPlanActivity,
+                        android.R.layout.simple_spinner_item,
+                        essenList.map { it.name }
+                    )
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     spinnerMeals.adapter = adapter
                 } else {
@@ -71,19 +86,61 @@ class EditPlanActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<Essen>>, t: Throwable) {
-                tvErrorMessage.text = "Fehler beim Laden der Essen"
+                tvErrorMessage.text = "Fehler beim Laden der Essen: ${t.message}"
                 tvErrorMessage.visibility = View.VISIBLE
             }
         })
     }
 
     private fun saveEditedPlan() {
-        tvSuccessMessage.text = "Plan erfolgreich gespeichert!"
-        tvSuccessMessage.visibility = View.VISIBLE
-        tvErrorMessage.visibility = View.GONE
+        // Token abrufen
+        val token = getToken() ?: ""
+        if (token.isEmpty()) {
+            tvErrorMessage.text = "Kein Authentifizierungstoken gefunden."
+            tvErrorMessage.visibility = View.VISIBLE
+            return
+        }
+
+        // Beispielplan für den Aufruf
+        val planId = 0 // Hier sollte die tatsächliche plan_id stehen
+
+        // Erstelle das PlanDetail-Objekt
+        val planDetails = PlanDetail(
+            plan_id = planId,  // Setze hier die korrekte plan_id
+            wochennummer = selectedWeek, // Verwende die initialisierte Variable selectedWeek
+            plan = listOf(
+                PlanEntry(tag = "Montag", essen_id = 1),
+                PlanEntry(tag = "Dienstag", essen_id = 2)
+            )
+        )
+
+        apiService.savePlanForWeek("Bearer $token", planDetails).enqueue(object : Callback<PlanResponse> {
+            override fun onResponse(call: Call<PlanResponse>, response: Response<PlanResponse>) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    val planId = responseBody?.plan_id ?: 0 // Erhalte die plan_id vom Server
+                    tvSuccessMessage.text = "Plan erfolgreich gespeichert! ID: $planId"
+                    tvSuccessMessage.visibility = View.VISIBLE
+                    tvErrorMessage.visibility = View.GONE
+                } else {
+                    tvErrorMessage.text = "Fehler beim Speichern des Plans"
+                    tvErrorMessage.visibility = View.VISIBLE
+                }
+            }
+
+            override fun onFailure(call: Call<PlanResponse>, t: Throwable) {
+                tvErrorMessage.text = "Fehler beim Speichern des Plans: ${t.message}"
+                tvErrorMessage.visibility = View.VISIBLE
+            }
+        })
     }
 
     private fun viewPlans() {
         // Navigiere zur Essensplan-Seite
+    }
+
+    private fun getToken(): String? {
+        val sharedPref = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        return sharedPref.getString("token", null)
     }
 }

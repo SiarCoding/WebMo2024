@@ -2,11 +2,7 @@ package com.example.webmo2024app.network
 
 import retrofit2.Call
 import retrofit2.http.*
-import com.example.webmo2024app.model.UserCredentials
-import com.example.webmo2024app.model.LoginResponse
-import com.example.webmo2024app.model.Essen
-import com.example.webmo2024app.model.PlanResponse
-import com.example.webmo2024app.model.Plan
+import com.example.webmo2024app.model.*
 
 interface ApiService {
 
@@ -15,33 +11,72 @@ interface ApiService {
     fun login(@Body credentials: UserCredentials): Call<LoginResponse>
 
     // Endpunkte für die Verwaltung von Essen (entsprechend der Tabelle 'food')
-    @GET("/api/essen") // Endpoint korrigiert von '/api/food' zu '/api/essen'
-    fun getAllEssen(): Call<List<Essen>>
+    @GET("/api/essen")
+    fun getAllEssen(@Header("Authorization") token: String): Call<List<Essen>>
 
-    @POST("/api/essen") // Endpoint korrigiert von '/api/food' zu '/api/essen'
-    fun addEssen(@Body essen: Essen): Call<Essen>
+    @GET("/api/essen/{id}")
+    fun getEssenById(@Header("Authorization") token: String, @Path("id") id: Int): Call<Essen>
 
-    @PUT("/api/essen/{id}") // Endpoint korrigiert von '/api/food/{id}' zu '/api/essen/{id}'
-    fun updateEssen(@Path("id") id: Int, @Body essen: Essen): Call<Essen>
+    @POST("/api/essen")
+    fun addEssen(
+        @Header("Authorization") token: String,
+        @Body foodData: Essen
+    ): Call<Essen>
 
-    @DELETE("/api/essen/{id}") // Endpoint korrigiert von '/api/food/{id}' zu '/api/essen/{id}'
-    fun deleteEssen(@Path("id") id: Int): Call<Void>
+    @PUT("/api/essen/{id}")
+    fun updateEssen(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body foodData: Map<String, Any>
+    ): Call<Essen>
 
-    // Endpunkte für die Plan-Verwaltung (entsprechend der Tabelle 'foodplan')
-    @GET("/api/essensplan/{week}") // Endpoint korrigiert von '/api/foodplan/{week}' zu '/api/essensplan/{week}'
-    fun getPlanForWeek(@Path("week") week: Int): Call<PlanResponse>
+    @DELETE("/api/essen/{id}")
+    fun deleteEssen(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Call<Void>
 
-    @POST("/api/essensplan/{week}") // Endpoint korrigiert von '/api/foodplan/{week}' zu '/api/essensplan/{week}'
-    fun savePlanForWeek(@Path("week") week: Int, @Body plan: Map<String, String?>): Call<Void>
+    // Endpunkte für die Verwaltung von Essensplänen (entsprechend der Tabelle 'foodplan')
+    @GET("/api/essensplan")
+    fun getAllEssensplaene(@Header("Authorization") token: String): Call<List<Plan>>
 
-    // Endpunkte für die Essenspläne (entsprechend der Tabellen 'foodplan' und 'food_in_plan')
-    @GET("/api/essensplan") // Endpoint korrigiert von '/api/foodplans' zu '/api/essensplan'
-    fun getAllEssensplaene(): Call<List<Plan>>
+    @GET("/api/essensplan/{week}")
+    fun getPlanForWeek(
+        @Header("Authorization") token: String,
+        @Path("week") week: Int
+    ): Call<PlanResponse>
 
-    @POST("/api/essensplan") // Endpoint korrigiert von '/api/foodplan' zu '/api/essensplan'
-    fun addEssensplan(@Body plan: Plan): Call<Void>
+    @POST("/api/essensplan")
+    fun savePlanForWeek(
+        @Header("Authorization") token: String,
+        @Body planDetails: PlanDetail
+    ): Call<PlanResponse>  // Rückgabewert auf PlanResponse ändern
 
-    @DELETE("/api/essensplan/{id}") // Endpoint korrigiert von '/api/foodplan/{id}' zu '/api/essensplan/{id}'
-    fun deleteEssensplan(@Path("id") id: Int): Call<Void>
+    @GET("/api/essensplan/{id}")
+    fun getPlanDetails(
+        @Header("Authorization") token: String,
+        @Path("id") planId: Int
+    ): Call<PlanDetail>
 
+    @PUT("/api/essensplan")
+    fun updatePlan(
+        @Header("Authorization") token: String,
+        @Body planDetail: PlanDetail
+    ): Call<PlanResponse>
+
+
+
+
+    @PUT("/api/essensplan/{week}")
+    fun updateEssensplan(
+        @Header("Authorization") token: String,
+        @Path("week") week: Int,
+        @Body planData: Map<String, Any>
+    ): Call<Void>
+
+    @DELETE("/api/essensplan/{id}")
+    fun deleteEssensplan(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Call<Void>
 }

@@ -5,12 +5,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Name Eingabefeld -->
     <EditText
         android:id="@+id/editTextName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Name" />
 
+    <!-- Preis Eingabefeld -->
     <EditText
         android:id="@+id/editTextPrice"
         android:layout_width="match_parent"
@@ -18,15 +20,25 @@
         android:hint="Preis"
         android:inputType="numberDecimal" />
 
-    <EditText
-        android:id="@+id/editTextType"
+    <!-- Spinner für die Auswahl des Typs -->
+    <Spinner
+        android:id="@+id/spinnerType"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Typ" />
+        android:layout_height="wrap_content" />
 
+    <!-- Hinzufügen Button -->
     <Button
         android:id="@+id/buttonAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hinzufügen" />
+
+    <!-- TextView für Nachrichten -->
+    <TextView
+        android:id="@+id/textMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:paddingTop="8dp" />
+
 </LinearLayout>

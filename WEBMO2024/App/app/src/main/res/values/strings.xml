@@ -3,8 +3,19 @@
     <!-- App Name -->
     <string name="app_name">webmo2024app</string>
 
-    <!-- Food Types (Typen von Essen) -->
+    <!-- Neue Strings hinzufügen -->
+    <string name="essen">Essen</string>
+    <string name="edit_plan">Edit Plan</string>
+    <string name="essensplan">Essensplan</string>
+    <string name="plaene">Pläne</string>
 
+    <!-- Food Types (Typen von Essen) -->
+    <string-array name="typ">
+        <item>Vegetarisch</item>
+        <item>Vegan</item>
+        <item>Fleisch</item>
+        <!-- Füge weitere Typen hinzu, falls nötig -->
+    </string-array>
 
     <!-- Days of the Week (Tage der Woche) -->
     <string-array name="tag">
@@ -15,12 +26,35 @@
         <item>Freitag</item>
     </string-array>
 
-    <!-- UI Texts -->
+    <!-- Week Strings -->
+    <string-array name="weeks">
+        <item>Woche 1</item>
+        <item>Woche 2</item>
+        <item>Woche 3</item>
+        <item>Woche 4</item>
+        <item>Woche 5</item>
+        <item>Woche 6</item>
+        <item>Woche 7</item>
+        <item>Woche 8</item>
+    </string-array>
+
+    <!-- UI Strings -->
+    <string name="essensplaene">Essenspläne</string>
+    <string name="previous_week">&lt;</string>
+    <string name="next_week">&gt;</string>
+    <string name="week_1">Woche 1</string>
+    <string name="tag">Tag</string>
+    <string name="name">Name</string>
+    <string name="preis">Preis</string>
+    <string name="total_price">Gesamtpreis: %.2f €</string>
+    <string name="edit">Bearbeiten</string> <!-- Richtiger String für den Button -->
+    <string name="delete">Löschen</string> <!-- Richtiger String für den Button -->
+    <string name="food_not_selected">Nicht ausgewählt</string>
+
+    <!-- Weitere UI-Texte -->
     <string name="essen_list">Liste der Essen</string>
     <string name="create_meal_plan">Essensplan erstellen</string>
     <string name="add_food">Essen hinzufügen</string>
-    <string name="edit">Bearbeiten</string>
-    <string name="delete">Löschen</string>
     <string name="food_price">Preis</string>
     <string name="select_week">Woche auswählen:</string>
     <string name="select_food">Wählen Sie ein Essen</string>
@@ -37,10 +71,12 @@
     <string name="select_role">Wählen Sie eine Rolle</string>
     <string name="login_success">Erfolgreich angemeldet!</string>
     <string name="error_message">Fehler beim Login. Bitte versuchen Sie es erneut.</string>
-    <string name="error_token_missing">Authentifizierung fehlgeschlagen. Token fehlt.</string>
+    <string name="error_token_missing">Kein Authentifizierungstoken gefunden.</string>
     <string name="fill_all_fields">Bitte alle Felder ausfüllen.</string>
 
-
+    <!-- General Messages -->
+    <string name="general_error">Ein Fehler ist aufgetreten: %1$s</string>
+    <string name="general_success">Aktion erfolgreich.</string>
 
     <!-- Plaene Activity -->
     <string name="plaene_title">Essenspläne für 8 Wochen</string>
@@ -49,28 +85,28 @@
     <string name="error_deleting_plan">Fehler beim Löschen des Essensplans</string>
     <string name="plan_deleted">Essensplan erfolgreich gelöscht</string>
     <string name="plan_for_week">Essensplan für Woche %1$d</string>
-
-
     <string name="edit_meal_plan_for_week">Bearbeite Essensplan für Woche</string>
-
     <string name="save_meal_plan">Plan speichern</string>
     <string name="view_meal_plans">Essenspläne ansehen</string>
 
-    <string-array name="typ">
-        <item>Vegetarisch</item>
-        <item>Vegan</item>
-        <item>Fleisch</item>
-        <!-- Füge weitere Typen hinzu, falls nötig -->
-    </string-array>
-    <!-- res/values/strings.xml -->
+    <!-- Messages for Adding Food -->
     <string name="please_fill_all_fields">Bitte alle Felder ausfüllen.</string>
     <string name="food_added_successfully">Essen erfolgreich hinzugefügt!</string>
     <string name="error_adding_food">Fehler beim Hinzufügen des Essens.</string>
     <string name="server_error">Serverfehler</string>
+
+    <!-- Additional UI Elements -->
     <string name="description">Beschreibung</string>
+    <string name="update_food">Essen aktualisieren</string>
+    <string name="food_updated_successfully">Essen erfolgreich aktualisiert!</string>
+    <string name="error_updating_food">Fehler beim Aktualisieren des Essens.</string>
 
+    <!-- Navigation Strings -->
+    <string name="back">Zurück</string>
+    <string name="next">Weiter</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="confirm">Bestätigen</string>
 
-
-
-
+    <!-- Weitere Strings -->
+    <string name="week_number">Woche %1$d</string>
 </resources>
