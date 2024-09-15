@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: sa           # Benutzername
+      POSTGRES_PASSWORD: 123       # Passwort
+      POSTGRES_DB: webmo2024       # Datenbankname
+    volumes:
+      - ./data:/var/lib/postgresql/data  # Stellt sicher, dass Daten persistent sind
+      - ./db-init:/docker-entrypoint-initdb.d  # Lädt SQL-Dateien beim ersten Start
+    ports:
+      - "5432:5432"                # PostgreSQL Standardport
+
+  app:
+    build: .
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "3001:3001"                # Der Port deines Backends
+    depends_on:
+      - db
+
+  # Optional: Client-Service für das Frontend
+  client:
+    build: .
+    volumes:
+      - .:/usr/src/client
+    ports:
+      - "5173:5173"                # Port für das Vue-Frontend (Vite Development Server)
+    depends_on:
+      - app
