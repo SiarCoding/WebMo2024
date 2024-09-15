@@ -4,8 +4,8 @@
       <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-body">
-            <h2 class="card-title text-center mb-4">Login</h2>
-            <form @submit.prevent="login" class="needs-validation" novalidate>
+            <h2 class="text-center mb-4">Login</h2>
+            <form @submit.prevent="login">
               <div class="mb-3">
                 <label for="username" class="form-label">Benutzername:</label>
                 <input id="username" type="text" v-model="username" class="form-control" required />
@@ -63,19 +63,9 @@ export default {
 
         if (response.data.success) {
           alert('Login erfolgreich!');
-          if (response.data.token) {
-            localStorage.setItem('token', response.data.token); // Token im Local Storage speichern
-          } else {
-            console.error('Token wurde nicht vom Server zurückgegeben.');
-          }
-
+          localStorage.setItem('token', response.data.token);
           localStorage.setItem('role', response.data.role);
-
-          if (response.data.role === 'admin') {
-            this.$router.push('/essen');
-          } else {
-            this.$router.push('/essen'); // Weiterleitung für normale Benutzer ebenfalls auf /essen
-          }
+          this.$router.push('/essen');
         } else {
           this.errorMessage = response.data.message;
         }
@@ -92,22 +82,10 @@ export default {
 .card {
   background-color: #f9f9f9;
   border-radius: 15px;
-  border: none;
-}
-
-.card-title {
-  font-weight: bold;
-  color: #333;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
 }
 
 .btn-primary:hover {
   background-color: #0056b3;
-  border-color: #0056b3;
 }
 
 .text-danger {

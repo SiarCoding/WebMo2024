@@ -40,6 +40,7 @@ const messages = {
       no_plan_for_week: 'No plan for week',
       invalid_plan_id: 'Invalid plan ID',
       change_language: 'Change Language',
+      plan_created_at: 'Plan created on',
       days: {
         Montag: 'Monday',
         Dienstag: 'Tuesday',
@@ -89,6 +90,7 @@ const messages = {
       no_plan_for_week: 'Kein Plan für Woche',
       invalid_plan_id: 'Ungültige Plan-ID',
       change_language: 'Sprache ändern',
+      plan_created_at: 'Plan erstellt am',
       days: {
         Montag: 'Montag',
         Dienstag: 'Dienstag',

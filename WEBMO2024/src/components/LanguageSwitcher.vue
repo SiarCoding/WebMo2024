@@ -1,4 +1,4 @@
-<!-- src/components/LanguageSwitcher.vue -->
+<!-- src/components/LanguageSwitcher.vue. Das wird verwendent um sprachen wechseln zu können mithilfe von vue i18n-->
 <template>
   <div class="d-flex justify-content-end p-3">
     <select class="form-select w-auto" v-model="currentLocale" @change="changeLocale">
@@ -24,7 +24,7 @@ export default {
 </script>
 
 <style scoped>
-/* Optional: Zusätzliche Stile für den LanguageSwitcher */
+
 .form-select {
   width: auto;
 }

@@ -51,12 +51,12 @@
       <button type="submit" class="btn btn-primary w-100 btn-lg shadow-sm">{{ $t('pages.save_food') }}</button>
     </form>
 
-    <!-- "Essen anzeigen" Button -->
     <div class="text-center mt-4">
       <button @click="showEssen" class="btn btn-warning btn-lg shadow-sm">{{ $t('pages.view_food') }}</button>
     </div>
 
-    <p v-if="message" class="mt-3 text-success text-center fw-bold">{{ message }}</p>
+    <!-- Fehlermeldungen -->
+    <p v-if="message" :class="messageType" class="mt-3 text-center fw-bold">{{ message }}</p>
   </div>
 </template>
 
@@ -66,63 +66,63 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      currentLocale: this.$i18n.locale, // Aktuelle Sprache
       essen: {
         name: '',
         preis: 0,
         art: ''
       },
-      message: ''
+      message: '',
+      messageType: '' // Dynamische Klasse für Fehlermeldung (text-danger oder text-success)
     };
   },
   methods: {
-    changeLocale() {
-      this.$i18n.locale = this.currentLocale; // Sprache ändern
-    },
     async hinzufuegen() {
-      console.log('Essen hinzufügen gestartet');
-
-      if (!this.essen.name || this.essen.preis <= 0 || !this.essen.art) {
-        this.message = this.$t('pages.fill_all_fields'); // Übersetzte Fehlermeldung
+      if (!this.isValidInput()) {
+        this.setMessage(this.$t('pages.fill_all_fields'), 'text-danger');
         return;
       }
 
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          this.message = this.$t('pages.no_token'); // Übersetzte Fehlermeldung
+          this.setMessage(this.$t('pages.no_token'), 'text-danger');
           return;
         }
 
         const response = await axios.post(
           'http://localhost:3001/api/essen',
           this.essen,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Token im Header hinzufügen
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log('Serverantwort:', response);
         if (response.data.success) {
-          this.message = this.$t('pages.food_added'); // Erfolgsnachricht übersetzen
+          this.resetForm();
+          this.setMessage(this.$t('pages.food_added'), 'text-success');
           this.$emit('essenAdded', response.data.essen);
-          this.essen = { name: '', preis: 0, art: '' };
         } else {
-          this.message = response.data.message; // Server-Fehlermeldung anzeigen
+          this.setMessage(response.data.message, 'text-danger');
         }
       } catch (error) {
-        console.error('Fehler beim Hinzufügen des Essens:', error);
-        if (error.response && error.response.data && error.response.data.message) {
-          this.message = error.response.data.message; // Zeige die Server-Nachricht an
-        } else {
-          this.message = this.$t('pages.server_error') + error.message; // Allgemeiner Fehler
-        }
+        this.handleError(error);
       }
     },
     showEssen() {
-      this.$router.push('/essen'); // Navigiert zur Seite '/essen'
+      this.$router.push('/essen');
+    },
+    resetForm() {
+      this.essen = { name: '', preis: 0, art: '' };
+    },
+    isValidInput() {
+      return this.essen.name && this.essen.preis > 0 && this.essen.art;
+    },
+    setMessage(message, type) {
+      this.message = message;
+      this.messageType = type;
+    },
+    handleError(error) {
+      console.error('Fehler beim Hinzufügen des Essens:', error);
+      const errorMessage = error.response?.data?.message || this.$t('pages.server_error') + error.message;
+      this.setMessage(errorMessage, 'text-danger');
     }
   }
 };
@@ -133,23 +133,12 @@ export default {
   max-width: 800px;
 }
 
-.card-title {
-  margin-bottom: 15px;
-}
-
-.text-danger,
-.text-success {
+.form-label {
   font-weight: bold;
 }
 
-.me-2 {
-  margin-right: 0.5rem;
-}
-
-.form-select {
-  font-size: 1.1rem;
-  padding: 10px;
-  border-radius: 5px;
+.shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary {
@@ -162,16 +151,17 @@ export default {
   border-color: #ffc107;
 }
 
-.text-center {
-  margin-bottom: 1.5rem;
-}
-
-.card {
-  border-radius: 10px;
-  background-color: #f8f9fa;
+.text-danger {
+  font-weight: bold;
+  color: red;
 }
 
 .text-success {
+  font-weight: bold;
   color: green;
+}
+
+.text-center {
+  margin-bottom: 1.5rem;
 }
 </style>
